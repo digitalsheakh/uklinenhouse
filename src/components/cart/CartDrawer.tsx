@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
@@ -8,6 +9,12 @@ import { formatPrice } from "@/lib/utils";
 
 export default function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQuantity, subtotal } = useCart();
+
+  // Load the saved cart from localStorage after mount (persist uses
+  // skipHydration) so the server and first client render always match.
+  useEffect(() => {
+    useCart.persist.rehydrate();
+  }, []);
 
   return (
     <AnimatePresence>

@@ -22,11 +22,11 @@
   --grey-800: #27272a;
   --grey-900: #18181b;        /* dark grey accents */
 
-  /* Brand accent — teal (used for primary buttons, links, highlights) */
-  --accent: #0e9aa7;
-  --accent-hover: #0b818c;
-  --accent-50: #e7f6f8;       /* soft accent tint for backgrounds */
-  --accent-100: #c9ecef;
+  /* Brand accent — deep navy (used for primary buttons, links, highlights) */
+  --accent: #1e3a5f;
+  --accent-hover: #152b46;
+  --accent-50: #eef2f7;       /* soft accent tint for backgrounds */
+  --accent-100: #d3deea;
 }
 
 @theme inline {

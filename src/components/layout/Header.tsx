@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, Search, ShoppingBag, X, ChevronDown, User, Heart, LayoutGrid } from "lucide-react";
+import { Menu, Search, ShoppingBag, X, ChevronDown, User, Heart } from "lucide-react";
 import Logo from "./Logo";
 import { CategoryNode } from "@/lib/data";
 import { useCart } from "@/store/cart";
@@ -15,6 +15,20 @@ export default function Header({ categories }: { categories: CategoryNode[] }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [searchCat, setSearchCat] = useState("");
+  const [hidden, setHidden] = useState(false);
+
+  // Hide the header when scrolling down, reveal it when scrolling up.
+  useEffect(() => {
+    let lastY = window.scrollY;
+    function onScroll() {
+      const y = window.scrollY;
+      if (y > lastY && y > 140) setHidden(true);
+      else if (y < lastY) setHidden(false);
+      lastY = y;
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const count = useCart((s) => s.count());
   const subtotal = useCart((s) => s.subtotal());
@@ -29,7 +43,11 @@ export default function Header({ categories }: { categories: CategoryNode[] }) {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-grey-200 bg-white">
+    <header
+      className={`sticky top-0 z-50 w-full border-b border-grey-200 bg-white transition-transform duration-300 ease-out ${
+        hidden ? "-translate-y-full" : "translate-y-0"
+      }`}
+    >
       {/* Main row */}
       <div className="mx-auto flex max-w-[1400px] items-center gap-3 px-4 py-3.5 sm:px-6 lg:gap-6">
         <button
@@ -115,20 +133,22 @@ export default function Header({ categories }: { categories: CategoryNode[] }) {
 
       {/* Nav row (desktop) */}
       <div className="hidden border-t border-grey-200 lg:block">
-        <div className="mx-auto flex max-w-[1400px] items-center gap-6 px-4 sm:px-6">
-          <Link
-            href="/shop"
-            className="flex items-center gap-2 bg-accent px-5 py-3 text-sm font-semibold text-white"
-          >
-            <LayoutGrid size={16} /> All Products
-          </Link>
-          <nav className="flex items-center gap-6">
-            <Link href="/shop" className="py-3 text-sm font-medium text-grey-700 hover:text-foreground">Shop</Link>
-            <Link href="/about" className="py-3 text-sm font-medium text-grey-700 hover:text-foreground">About Us</Link>
-            <Link href="/contact" className="py-3 text-sm font-medium text-grey-700 hover:text-foreground">Contact Us</Link>
-            <Link href="/wholesale" className="py-3 text-sm font-medium text-grey-700 hover:text-foreground">Wholesale</Link>
-          </nav>
-        </div>
+        <nav className="mx-auto flex max-w-[1400px] items-center justify-center gap-10 px-4 sm:px-6">
+          {[
+            { href: "/about", label: "About Us" },
+            { href: "/contact", label: "Contact Us" },
+            { href: "/wholesale", label: "Wholesale" },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="group relative py-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-grey-700 transition-colors hover:text-accent"
+            >
+              {item.label}
+              <span className="absolute inset-x-0 bottom-0 h-0.5 origin-center scale-x-0 bg-accent transition-transform duration-200 group-hover:scale-x-100" />
+            </Link>
+          ))}
+        </nav>
       </div>
 
       {/* Mobile menu */}

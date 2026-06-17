@@ -2,8 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
 import { heroSlides } from "@/config/slides";
 
 export default function HeroSlider() {
@@ -11,7 +10,6 @@ export default function HeroSlider() {
   const count = heroSlides.length;
 
   const go = useCallback((i: number) => setIndex((i + count) % count), [count]);
-  const next = useCallback(() => go(index + 1), [go, index]);
 
   // Auto-advance every 6s
   useEffect(() => {
@@ -20,84 +18,70 @@ export default function HeroSlider() {
     return () => clearInterval(t);
   }, [count]);
 
-  const slide = heroSlides[index];
-
   return (
-    <div className="relative h-[320px] overflow-hidden rounded-xl bg-grey-100 sm:h-[400px] lg:h-[460px]">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={index}
-          initial={{ opacity: 0, scale: 1.02 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-          className="absolute inset-0"
+    <div className="relative h-[400px] overflow-hidden rounded-2xl bg-grey-50 shadow-sm ring-1 ring-grey-200 sm:h-[480px] lg:h-[560px]">
+      {/* Slides — text on the left, full product image on the right */}
+      {heroSlides.map((slide, i) => (
+        <div
+          key={i}
+          aria-hidden={i !== index}
+          className={`absolute inset-0 transition-opacity duration-700 ease-out ${
+            i === index ? "opacity-100" : "pointer-events-none opacity-0"
+          }`}
         >
-          {/* Background: image if provided, else grey gradient */}
-          {slide.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={slide.image} alt="" className="h-full w-full object-cover" />
-          ) : (
-            <div className="h-full w-full bg-gradient-to-br from-grey-200 via-grey-100 to-white" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/60 to-transparent" />
+          <div className="flex h-full">
+            {/* Text — left */}
+            <div className="flex w-[52%] flex-col justify-center pl-5 pr-2 sm:w-1/2 sm:pl-10 sm:pr-4 lg:pl-14">
+              {slide.label && (
+                <span className="mb-2.5 w-fit text-[10px] font-bold uppercase tracking-[0.16em] text-accent sm:mb-3 sm:text-xs">
+                  {slide.label}
+                </span>
+              )}
+              <h2 className="text-xl font-bold leading-[1.12] tracking-tight text-foreground sm:text-4xl lg:text-[3.25rem]">
+                {slide.heading}
+              </h2>
+              {slide.subtext && (
+                <p className="mt-2.5 max-w-md text-[11px] leading-relaxed text-grey-600 sm:mt-4 sm:text-base">
+                  {slide.subtext}
+                </p>
+              )}
+              <div>
+                <Link
+                  href={slide.buttonLink}
+                  className="mt-4 inline-flex w-fit items-center rounded-lg bg-accent px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-accent-hover sm:mt-7 sm:px-8 sm:py-3.5 sm:text-sm"
+                >
+                  {slide.buttonText}
+                </Link>
+              </div>
+            </div>
 
-          {/* Content */}
-          <div className="absolute inset-0 z-10 flex max-w-xl flex-col justify-center px-8 sm:px-12 lg:px-16">
-            {slide.label && (
-              <span className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-grey-500">
-                {slide.label}
-              </span>
-            )}
-            <h2 className="text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-              {slide.heading}
-            </h2>
-            {slide.subtext && (
-              <p className="mt-4 max-w-md text-sm text-grey-600 sm:text-base">{slide.subtext}</p>
-            )}
-            <div>
-              <Link
-                href={slide.buttonLink}
-                className="group mt-7 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
-              >
-                {slide.buttonText}
-                <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-              </Link>
+            {/* Image — right (full image, never cropped) */}
+            <div className="flex w-[48%] items-center justify-center p-3 sm:w-1/2 sm:p-8">
+              <Image
+                src={slide.image}
+                alt={slide.heading}
+                width={900}
+                height={900}
+                quality={90}
+                priority={i === 0}
+                sizes="(max-width: 1024px) 48vw, 520px"
+                className="h-full w-full object-contain"
+              />
             </div>
           </div>
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Arrows */}
-      {count > 1 && (
-        <>
-          <button
-            onClick={() => go(index - 1)}
-            className="absolute left-3 top-1/2 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white/80 p-2 text-foreground shadow-sm backdrop-blur hover:bg-white sm:flex"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft size={20} />
-          </button>
-          <button
-            onClick={next}
-            className="absolute right-3 top-1/2 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white/80 p-2 text-foreground shadow-sm backdrop-blur hover:bg-white sm:flex"
-            aria-label="Next slide"
-          >
-            <ChevronRight size={20} />
-          </button>
-        </>
-      )}
+        </div>
+      ))}
 
       {/* Dots */}
       {count > 1 && (
-        <div className="absolute bottom-4 left-8 flex gap-2 sm:left-12 lg:left-16">
+        <div className="absolute bottom-4 left-5 z-20 flex gap-2 sm:bottom-5 sm:left-10 lg:left-14">
           {heroSlides.map((_, i) => (
             <button
               key={i}
               onClick={() => go(i)}
               aria-label={`Go to slide ${i + 1}`}
-              className={`h-1.5 rounded-full transition-all ${
-                i === index ? "w-7 bg-foreground" : "w-3 bg-grey-400 hover:bg-grey-500"
+              className={`h-2 rounded-full transition-all ${
+                i === index ? "w-8 bg-accent" : "w-2.5 bg-grey-300 hover:bg-grey-400"
               }`}
             />
           ))}

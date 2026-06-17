@@ -2,14 +2,14 @@
 
 import { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
-import SmoothScroll from "./SmoothScroll";
 
 /**
- * Global client-side providers: smooth scroll + toast notifications.
+ * Global client-side providers: toast notifications.
+ * (Native browser scrolling — no smooth-scroll inertia.)
  */
 export default function Providers({ children }: { children: ReactNode }) {
   return (
-    <SmoothScroll>
+    <>
       {children}
       <Toaster
         position="bottom-right"
@@ -22,6 +22,6 @@ export default function Providers({ children }: { children: ReactNode }) {
           },
         }}
       />
-    </SmoothScroll>
+    </>
   );
 }
