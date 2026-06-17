@@ -1,0 +1,85 @@
+"use client";
+
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+
+export interface CartItem {
+  productId: string;
+  variantId?: string; // undefined for simple products
+  variantLabel?: string; // e.g. "Grey / Large"
+  name: string;
+  slug: string;
+  price: number;
+  image?: string;
+  quantity: number;
+}
+
+/** Unique line identity = product + variant. */
+function lineId(productId: string, variantId?: string) {
+  return `${productId}::${variantId || ""}`;
+}
+
+interface CartState {
+  items: CartItem[];
+  isOpen: boolean;
+  addItem: (item: Omit<CartItem, "quantity">, qty?: number) => void;
+  removeItem: (productId: string, variantId?: string) => void;
+  updateQuantity: (productId: string, variantId: string | undefined, quantity: number) => void;
+  clear: () => void;
+  openCart: () => void;
+  closeCart: () => void;
+  count: () => number;
+  subtotal: () => number;
+}
+
+export const useCart = create<CartState>()(
+  persist(
+    (set, get) => ({
+      items: [],
+      isOpen: false,
+
+      addItem: (item, qty = 1) =>
+        set((state) => {
+          const id = lineId(item.productId, item.variantId);
+          const existing = state.items.find((i) => lineId(i.productId, i.variantId) === id);
+          if (existing) {
+            return {
+              items: state.items.map((i) =>
+                lineId(i.productId, i.variantId) === id
+                  ? { ...i, quantity: i.quantity + qty }
+                  : i
+              ),
+              isOpen: true,
+            };
+          }
+          return { items: [...state.items, { ...item, quantity: qty }], isOpen: true };
+        }),
+
+      removeItem: (productId, variantId) =>
+        set((state) => ({
+          items: state.items.filter(
+            (i) => lineId(i.productId, i.variantId) !== lineId(productId, variantId)
+          ),
+        })),
+
+      updateQuantity: (productId, variantId, quantity) =>
+        set((state) => ({
+          items: state.items
+            .map((i) =>
+              lineId(i.productId, i.variantId) === lineId(productId, variantId)
+                ? { ...i, quantity }
+                : i
+            )
+            .filter((i) => i.quantity > 0),
+        })),
+
+      clear: () => set({ items: [] }),
+      openCart: () => set({ isOpen: true }),
+      closeCart: () => set({ isOpen: false }),
+
+      count: () => get().items.reduce((n, i) => n + i.quantity, 0),
+      subtotal: () => get().items.reduce((s, i) => s + i.price * i.quantity, 0),
+    }),
+    { name: "ulh-cart" }
+  )
+);

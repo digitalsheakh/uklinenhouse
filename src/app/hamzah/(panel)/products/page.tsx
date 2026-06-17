@@ -1,0 +1,154 @@
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
+import { Plus, Pencil, Trash2, Loader2, Search, Package } from "lucide-react";
+import toast from "react-hot-toast";
+import { formatPrice } from "@/lib/utils";
+
+interface Prod {
+  _id: string;
+  name: string;
+  price: number;
+  stock: number;
+  images: string[];
+  isActive: boolean;
+  featured: boolean;
+  category?: { name?: string };
+}
+
+export default function ProductsPage() {
+  const [products, setProducts] = useState<Prod[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+
+  const load = useCallback(async (q = "") => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/admin/products${q ? `?search=${encodeURIComponent(q)}` : ""}`);
+      const data = await res.json();
+      if (res.ok) setProducts(data.products);
+      else toast.error(data.error || "Failed to load");
+    } catch {
+      toast.error("Failed to load products");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // debounce search
+  useEffect(() => {
+    const t = setTimeout(() => load(search), 350);
+    return () => clearTimeout(t);
+  }, [search, load]);
+
+  async function remove(p: Prod) {
+    if (!confirm(`Delete "${p.name}"?`)) return;
+    try {
+      const res = await fetch(`/api/admin/products/${p._id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      toast.success("Deleted");
+      load(search);
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
+  }
+
+  return (
+    <div>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-foreground">Products</h1>
+          <p className="mt-1 text-sm text-grey-500">{products.length} product(s)</p>
+        </div>
+        <Link
+          href="/hamzah/products/new"
+          className="inline-flex items-center gap-2 rounded-lg bg-foreground px-4 py-2.5 text-sm font-semibold text-white hover:bg-accent-hover"
+        >
+          <Plus size={16} /> Add Product
+        </Link>
+      </div>
+
+      <div className="mb-4 relative max-w-sm">
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-grey-400" />
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search products…"
+          className="w-full rounded-lg border border-grey-200 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-foreground"
+        />
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-20 text-grey-400"><Loader2 className="animate-spin" /></div>
+      ) : products.length === 0 ? (
+        <div className="flex flex-col items-center rounded-2xl border border-dashed border-grey-300 bg-white py-16 text-center">
+          <Package size={36} className="text-grey-300" />
+          <p className="mt-3 text-sm font-medium text-grey-600">No products yet</p>
+          <Link href="/hamzah/products/new" className="mt-3 text-sm font-medium text-foreground underline">
+            Add your first product
+          </Link>
+        </div>
+      ) : (
+        <div className="overflow-hidden rounded-2xl border border-grey-200 bg-white">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-grey-200 text-left text-xs uppercase tracking-wide text-grey-400">
+                <th className="px-4 py-3 font-medium">Product</th>
+                <th className="hidden px-4 py-3 font-medium sm:table-cell">Category</th>
+                <th className="px-4 py-3 font-medium">Price</th>
+                <th className="hidden px-4 py-3 font-medium sm:table-cell">Stock</th>
+                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3" />
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((p) => (
+                <tr key={p._id} className="border-b border-grey-100 last:border-0">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md bg-grey-100">
+                        {p.images[0] ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={p.images[0]} alt="" className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-grey-300">
+                            <Package size={16} />
+                          </div>
+                        )}
+                      </div>
+                      <span className="font-medium text-foreground line-clamp-1">{p.name}</span>
+                    </div>
+                  </td>
+                  <td className="hidden px-4 py-3 text-grey-500 sm:table-cell">{p.category?.name || "—"}</td>
+                  <td className="px-4 py-3 text-foreground">{formatPrice(p.price)}</td>
+                  <td className="hidden px-4 py-3 text-grey-500 sm:table-cell">{p.stock}</td>
+                  <td className="px-4 py-3">
+                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${p.isActive ? "bg-green-50 text-green-700" : "bg-grey-100 text-grey-500"}`}>
+                      {p.isActive ? "Active" : "Hidden"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-1">
+                      <Link href={`/hamzah/products/${p._id}/edit`} className="rounded-md p-2 text-grey-400 hover:bg-grey-50 hover:text-foreground" aria-label="Edit">
+                        <Pencil size={15} />
+                      </Link>
+                      <button onClick={() => remove(p)} className="rounded-md p-2 text-grey-400 hover:bg-grey-50 hover:text-red-600" aria-label="Delete">
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
