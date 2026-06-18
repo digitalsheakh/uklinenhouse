@@ -89,6 +89,20 @@ export async function getFeaturedProducts(limit = 8): Promise<ProductCard[]> {
   }
 }
 
+/** Get "best quality" products for the homepage (admin-curated). */
+export async function getBestQualityProducts(limit = 8): Promise<ProductCard[]> {
+  try {
+    await connectDB();
+    const products = await Product.find({ isActive: true, bestQuality: true })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+    return products.map((p) => toCard(p as unknown as Record<string, unknown>));
+  } catch {
+    return [];
+  }
+}
+
 /** Get latest products. */
 export async function getLatestProducts(limit = 8): Promise<ProductCard[]> {
   try {

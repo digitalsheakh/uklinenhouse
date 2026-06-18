@@ -23,6 +23,7 @@ export interface IUser {
   companyName?: string;
   vatNumber?: string;
   businessType?: string;
+  message?: string; // optional query submitted with a trade enquiry
   approved: boolean; // wholesale accounts approved by admin
   createdAt: Date;
   updatedAt: Date;
@@ -53,6 +54,7 @@ const UserSchema = new Schema<IUser>(
     companyName: { type: String, default: "" },
     vatNumber: { type: String, default: "" },
     businessType: { type: String, default: "" },
+    message: { type: String, default: "" },
     approved: { type: Boolean, default: true }, // retail auto-approved; wholesale set false on apply
   },
   { timestamps: true }

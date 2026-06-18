@@ -67,6 +67,7 @@ export default function ProductCard({ product }: { product: TProductCard }) {
             <span className="text-sm font-semibold text-foreground">
               {formatPriceRange(product.price, product.priceMax)}
             </span>
+            <span className="text-[11px] text-grey-400">ex VAT</span>
             {discounted && (
               <span className="text-xs text-grey-400 line-through">
                 {formatPrice(product.compareAtPrice!)}

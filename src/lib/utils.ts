@@ -16,6 +16,19 @@ export function formatPrice(amount: number): string {
   return `${siteConfig.currencySymbol}${amount.toFixed(2)}`;
 }
 
+/** VAT amount for an ex-VAT price. */
+export function vatOf(amount: number): number {
+  return amount * siteConfig.vatRate;
+}
+
+/** Price including VAT, from an ex-VAT price. */
+export function withVat(amount: number): number {
+  return amount * (1 + siteConfig.vatRate);
+}
+
+/** VAT rate as a whole-number percentage, e.g. 20. */
+export const vatPercent = Math.round(siteConfig.vatRate * 100);
+
 /** Format a price, or a range "£4 – £28" when min and max differ. */
 export function formatPriceRange(min: number, max?: number): string {
   if (typeof max === "number" && max > min) {

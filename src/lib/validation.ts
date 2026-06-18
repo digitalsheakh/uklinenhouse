@@ -19,6 +19,7 @@ export const wholesaleSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters").max(100),
   businessType: z.string().max(80).optional(),
   vatNumber: z.string().max(40).optional(),
+  message: z.string().max(2000).optional(),
 });
 
 export const categorySchema = z.object({
@@ -66,6 +67,7 @@ export const productSchema = z.object({
   options: z.array(optionSchema).optional(),
   variants: z.array(variantSchema).optional(),
   featured: z.boolean().optional(),
+  bestQuality: z.boolean().optional(),
   isActive: z.boolean().optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),

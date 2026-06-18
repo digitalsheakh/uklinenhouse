@@ -21,6 +21,7 @@ export interface EditorVariant {
 }
 
 const PRESETS = ["Size", "Colour", "Material", "Pack size"];
+const MAX_OPTIONS = 5; // option *types* (e.g. Size, Colour). Each can hold unlimited values.
 
 const isColour = (name: string) => /colou?r/i.test(name);
 const signature = (opts: { name: string; value: string }[]) =>
@@ -41,7 +42,7 @@ export default function VariantsEditor({
   const setVariants = (vars: EditorVariant[]) => onChange({ options, variants: vars });
 
   function addOption(name = "") {
-    if (options.length >= 3) return toast.error("Up to 3 options");
+    if (options.length >= MAX_OPTIONS) return toast.error(`Up to ${MAX_OPTIONS} options`);
     setOptions([...options, { name, values: [] }]);
   }
   function updateOptionName(i: number, name: string) {
@@ -52,11 +53,21 @@ export default function VariantsEditor({
   function removeOption(i: number) {
     setOptions(options.filter((_, idx) => idx !== i));
   }
-  function addValue(i: number, value: string, swatch?: string) {
-    if (!value.trim()) return;
+  function addValue(i: number, raw: string, swatch?: string) {
+    // Accept a single value or several separated by commas (e.g. "S, M, L").
+    const parts = raw.split(",").map((s) => s.trim()).filter(Boolean);
+    if (parts.length === 0) return;
     const next = [...options];
-    if (next[i].values.some((v) => v.value.toLowerCase() === value.toLowerCase())) return;
-    next[i] = { ...next[i], values: [...next[i].values, { value: value.trim(), swatch }] };
+    const seen = new Set(next[i].values.map((v) => v.value.toLowerCase()));
+    const toAdd: EditorOptionValue[] = [];
+    for (const p of parts) {
+      if (!seen.has(p.toLowerCase())) {
+        seen.add(p.toLowerCase());
+        toAdd.push({ value: p, swatch });
+      }
+    }
+    if (toAdd.length === 0) return;
+    next[i] = { ...next[i], values: [...next[i].values, ...toAdd] };
     setOptions(next);
   }
   function removeValue(i: number, vi: number) {
@@ -192,6 +203,10 @@ export default function VariantsEditor({
             <option key={p} value={p} />
           ))}
         </datalist>
+        <p className="text-xs text-grey-400">
+          An &ldquo;option&rdquo; is an attribute like Size or Colour (up to {MAX_OPTIONS}). Each option can have as
+          many values as you need, for example Size: S, M, L, XL, XXL.
+        </p>
       </div>
 
       {options.length > 0 && (
@@ -268,18 +283,24 @@ export default function VariantsEditor({
 }
 
 function ValueInput({ colour, onAdd }: { colour: boolean; onAdd: (val: string, swatch?: string) => void }) {
+  const commit = (input: HTMLInputElement) => {
+    if (input.value.trim()) {
+      onAdd(input.value, colour ? "#cccccc" : undefined);
+      input.value = "";
+    }
+  };
   return (
     <input
-      placeholder="+ add value, press Enter"
-      className="min-w-[140px] flex-1 rounded-lg border border-dashed border-grey-300 px-2 py-1 text-xs outline-none focus:border-foreground"
+      placeholder="+ add value(s), e.g. S, M, L — Enter to add"
+      className="min-w-[180px] flex-1 rounded-lg border border-dashed border-grey-300 px-2 py-1 text-xs outline-none focus:border-foreground"
       onKeyDown={(e) => {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" || e.key === ",") {
           e.preventDefault();
-          const input = e.currentTarget;
-          onAdd(input.value, colour ? "#cccccc" : undefined);
-          input.value = "";
+          commit(e.currentTarget);
         }
       }}
+      // Commit any typed value when focus leaves (e.g. clicking "Generate variants").
+      onBlur={(e) => commit(e.currentTarget)}
     />
   );
 }

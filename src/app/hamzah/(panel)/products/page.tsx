@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { Plus, Pencil, Trash2, Loader2, Search, Package } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Plus, Pencil, Trash2, Loader2, Search, Package, Copy } from "lucide-react";
 import toast from "react-hot-toast";
 import { formatPrice } from "@/lib/utils";
 
@@ -18,9 +19,11 @@ interface Prod {
 }
 
 export default function ProductsPage() {
+  const router = useRouter();
   const [products, setProducts] = useState<Prod[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   const load = useCallback(async (q = "") => {
     setLoading(true);
@@ -56,6 +59,44 @@ export default function ProductsPage() {
       load(search);
     } catch (err) {
       toast.error((err as Error).message);
+    }
+  }
+
+  // Duplicate a product: copy all its details into a new "(Copy)" product,
+  // then open the copy in the editor.
+  async function duplicate(p: Prod) {
+    setBusyId(p._id);
+    try {
+      const res = await fetch(`/api/admin/products/${p._id}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not load product");
+      const src = data.product as Record<string, unknown>;
+
+      const payload: Record<string, unknown> = { ...src, name: `${p.name} (Copy)`, sku: "", featured: false, bestQuality: false };
+      // Drop identity / server-managed fields so a fresh product is created.
+      delete payload._id;
+      delete payload.slug;
+      delete payload.priceMax;
+      delete payload.createdAt;
+      delete payload.updatedAt;
+      delete payload.__v;
+
+      const create = await fetch("/api/admin/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const created = await create.json();
+      if (!create.ok) throw new Error(created.error || "Failed to duplicate");
+
+      toast.success("Product duplicated");
+      const newId = created.product?._id;
+      if (newId) router.push(`/hamzah/products/${newId}/edit`);
+      else load(search);
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setBusyId(null);
     }
   }
 
@@ -138,6 +179,15 @@ export default function ProductsPage() {
                       <Link href={`/hamzah/products/${p._id}/edit`} className="rounded-md p-2 text-grey-400 hover:bg-grey-50 hover:text-foreground" aria-label="Edit">
                         <Pencil size={15} />
                       </Link>
+                      <button
+                        onClick={() => duplicate(p)}
+                        disabled={busyId === p._id}
+                        className="rounded-md p-2 text-grey-400 hover:bg-grey-50 hover:text-foreground disabled:opacity-50"
+                        aria-label="Duplicate"
+                        title="Duplicate"
+                      >
+                        {busyId === p._id ? <Loader2 size={15} className="animate-spin" /> : <Copy size={15} />}
+                      </button>
                       <button onClick={() => remove(p)} className="rounded-md p-2 text-grey-400 hover:bg-grey-50 hover:text-red-600" aria-label="Delete">
                         <Trash2 size={15} />
                       </button>

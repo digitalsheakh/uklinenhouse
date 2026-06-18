@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
 
-    const { name, companyName, email, phone, password, businessType, vatNumber } = parsed.data;
+    const { name, companyName, email, phone, password, businessType, vatNumber, message } = parsed.data;
     await connectDB();
 
     const existing = await User.findOne({ email: email.toLowerCase() });
@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
       passwordHash,
       businessType: businessType || "",
       vatNumber: vatNumber || "",
+      message: message || "",
       accountType: "wholesale",
       approved: false,
     });

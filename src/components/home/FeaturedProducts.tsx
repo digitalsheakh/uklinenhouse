@@ -15,14 +15,12 @@ export default function FeaturedProducts({
 }) {
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20">
-      <Reveal className="mb-10 flex items-end justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{title}</h2>
-          {subtitle && <p className="mt-2 text-sm text-grey-500">{subtitle}</p>}
-        </div>
+      <Reveal className="mb-10 flex flex-col items-center text-center">
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{title}</h2>
+        {subtitle && <p className="mt-2 text-sm text-grey-500">{subtitle}</p>}
         <Link
           href="/shop"
-          className="hidden items-center gap-1 text-sm font-medium text-grey-600 hover:text-foreground sm:inline-flex"
+          className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-grey-600 hover:text-foreground"
         >
           View all <ArrowUpRight size={16} />
         </Link>

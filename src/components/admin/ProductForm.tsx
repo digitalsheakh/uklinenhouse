@@ -2,9 +2,13 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Upload, X, Sparkles, ImagePlus } from "lucide-react";
+import { Loader2, Upload, X, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
 import VariantsEditor, { EditorOption, EditorVariant } from "./VariantsEditor";
+import { formatPrice, withVat, vatPercent } from "@/lib/utils";
+import { siteConfig } from "@/config/site";
+
+const shippingFee = siteConfig.shippingFee;
 
 interface CatOpt {
   _id: string;
@@ -60,6 +64,19 @@ export default function ProductForm({ initial }: { initial?: ProductFormData }) 
   const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
   const [showPreview, setShowPreview] = useState(false);
+  const [dragging, setDragging] = useState(false); // file drop-zone highlight
+  const [dragIndex, setDragIndex] = useState<number | null>(null); // thumbnail being reordered
+
+  // Move an image to a new position (used for drag-to-reorder; index 0 = main image).
+  function moveImage(from: number, to: number) {
+    if (from === to) return;
+    setForm((f) => {
+      const imgs = [...f.images];
+      const [moved] = imgs.splice(from, 1);
+      imgs.splice(to, 0, moved);
+      return { ...f, images: imgs };
+    });
+  }
 
   function addImageUrl() {
     const url = imageUrl.trim();
@@ -276,34 +293,75 @@ export default function ProductForm({ initial }: { initial?: ProductFormData }) 
         </Card>
 
         <Card title="Images">
-          <div className="flex flex-wrap gap-3">
-            {form.images.map((img) => (
-              <div key={img} className="relative h-24 w-24 overflow-hidden rounded-lg border border-grey-200">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={img} alt="" className="h-full w-full object-cover" />
-                <button
-                  type="button"
-                  onClick={() => removeImage(img)}
-                  className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white"
-                  aria-label="Remove image"
+          {/* Drag-and-drop upload zone */}
+          <label
+            onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragging(false);
+              handleUpload(e.dataTransfer.files);
+            }}
+            className={`flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors ${
+              dragging ? "border-foreground bg-accent-50 text-foreground" : "border-grey-300 text-grey-400 hover:border-foreground hover:text-foreground"
+            }`}
+          >
+            {uploading ? <Loader2 size={24} className="animate-spin" /> : <Upload size={24} />}
+            <span className="text-sm font-medium">
+              {uploading ? "Uploading…" : "Drag & drop images here, or click to browse"}
+            </span>
+            <span className="text-xs text-grey-400">The first image is the main image. Max 5MB each.</span>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={(e) => handleUpload(e.target.files)}
+            />
+          </label>
+
+          {/* Thumbnails — drag to reorder; drop into first position to set the main image */}
+          {form.images.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-3">
+              {form.images.map((img, i) => (
+                <div
+                  key={img}
+                  draggable
+                  onDragStart={() => setDragIndex(i)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (dragIndex !== null) moveImage(dragIndex, i);
+                    setDragIndex(null);
+                  }}
+                  onDragEnd={() => setDragIndex(null)}
+                  title="Drag to reorder"
+                  className={`group relative h-24 w-24 cursor-grab overflow-hidden rounded-lg border active:cursor-grabbing ${
+                    i === 0 ? "border-foreground ring-2 ring-foreground/20" : "border-grey-200"
+                  } ${dragIndex === i ? "opacity-50" : ""}`}
                 >
-                  <X size={12} />
-                </button>
-              </div>
-            ))}
-            <label className="flex h-24 w-24 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-grey-300 text-grey-400 hover:border-foreground hover:text-foreground">
-              {uploading ? <Loader2 size={20} className="animate-spin" /> : <ImagePlus size={20} />}
-              <span className="text-[10px]">Upload</span>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onChange={(e) => handleUpload(e.target.files)}
-              />
-            </label>
-          </div>
-          <p className="mt-3 text-xs text-grey-400">First image is used as the main thumbnail. Max 5MB each. Drag to reorder is not enabled — remove and re-add to change the main image.</p>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img} alt="" className="h-full w-full object-cover" draggable={false} />
+                  {i === 0 && (
+                    <span className="absolute bottom-0 inset-x-0 bg-foreground/80 py-0.5 text-center text-[10px] font-semibold text-white">
+                      Main
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeImage(img)}
+                    className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                    aria-label="Remove image"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="mt-3 text-xs text-grey-400">
+            Drag a thumbnail into the first position to make it the main image.
+          </p>
 
           {/* Add image by URL */}
           <div className="mt-3 flex gap-2">
@@ -412,10 +470,22 @@ export default function ProductForm({ initial }: { initial?: ProductFormData }) 
         </Card>
 
         <Card title="Pricing & stock">
-          <Field label="Price (£)" hint={form.variants.length > 0 ? "Ignored — price comes from variants below." : "Base price for this product."}>
+          <p className="mb-3 rounded-lg bg-accent-50 px-3 py-2 text-xs text-accent">
+            Enter all prices <strong>excluding VAT</strong>. {vatPercent}% VAT and {formatPrice(shippingFee)} shipping are added automatically at checkout.
+          </p>
+          <Field
+            label="Price (£, ex VAT)"
+            hint={
+              form.variants.length > 0
+                ? "Ignored. Price comes from variants below."
+                : form.price
+                ? `Customer pays ${formatPrice(withVat(Number(form.price) || 0))} inc. VAT (before shipping).`
+                : "Base price for this product, excluding VAT."
+            }
+          >
             <input type="number" step="0.01" min="0" value={form.price} onChange={(e) => set("price", e.target.value)} className="inp" placeholder="0.00" disabled={form.variants.length > 0} />
           </Field>
-          <Field label="Compare-at price (£)" hint="Optional — shows a struck-through 'was' price.">
+          <Field label="Compare-at price (£, ex VAT)" hint="Optional. Shows a struck-through 'was' price.">
             <input type="number" step="0.01" min="0" value={form.compareAtPrice} onChange={(e) => set("compareAtPrice", e.target.value)} className="inp" placeholder="0.00" />
           </Field>
           <Field label="Stock quantity">

@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import FeatureStrip from "@/components/home/FeatureStrip";
+import TopCategories from "@/components/home/TopCategories";
+import FeaturedSection from "@/components/home/FeaturedSection";
+import BestQualitySection from "@/components/home/BestQualitySection";
+import SaleSection from "@/components/home/SaleSection";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
-import BrandStory from "@/components/home/BrandStory";
-import WarehousePromo from "@/components/home/WarehousePromo";
 import HeroSlider from "@/components/home/HeroSlider";
 import CategorySidebar from "@/components/layout/CategorySidebar";
-import { getCategoryTree, getSaleProducts, getLatestProducts } from "@/lib/data";
+import { getCategoryTree, getSaleProducts, getLatestProducts, getFeaturedProducts, getBestQualityProducts } from "@/lib/data";
 import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
@@ -15,10 +17,12 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [categories, onSale, latest] = await Promise.all([
+  const [categories, onSale, latest, featured, bestQuality] = await Promise.all([
     getCategoryTree(),
     getSaleProducts(8),
     getLatestProducts(8),
+    getFeaturedProducts(12),
+    getBestQualityProducts(12),
   ]);
 
   return (
@@ -38,23 +42,20 @@ export default async function HomePage() {
       {/* Trust strip (under header) */}
       <FeatureStrip />
 
-      {/* On Sale — only shown when there are discounted products */}
-      {onSale.length > 0 && (
-        <FeaturedProducts title="On Sale" subtitle="Limited-time offers" products={onSale} />
-      )}
+      {/* Top categories (image tiles, scrolls left↔right on mobile) */}
+      <TopCategories />
+
+      {/* Featured products — admin-controlled via each product's "Featured" flag */}
+      <FeaturedSection products={featured} />
+
+      {/* On Sale — admin-controlled via each product's Compare-at price */}
+      <SaleSection products={onSale} />
 
       {/* All Products */}
-      <FeaturedProducts
-        title="All Products"
-        subtitle="Browse our latest range"
-        products={latest}
-      />
+      <FeaturedProducts title="All Products" products={latest} />
 
-      {/* Brand story */}
-      <BrandStory />
-
-      {/* UK warehouse */}
-      <WarehousePromo />
+      {/* Best Quality — admin-controlled via each product's "Best Quality" flag */}
+      <BestQualitySection products={bestQuality} />
     </>
   );
 }

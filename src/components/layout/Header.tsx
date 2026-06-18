@@ -14,7 +14,6 @@ export default function Header({ categories }: { categories: CategoryNode[] }) {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [searchCat, setSearchCat] = useState("");
   const [hidden, setHidden] = useState(false);
 
   // Hide the header when scrolling down, reveal it when scrolling up.
@@ -38,7 +37,6 @@ export default function Header({ categories }: { categories: CategoryNode[] }) {
     e.preventDefault();
     const params = new URLSearchParams();
     if (query.trim()) params.set("q", query.trim());
-    if (searchCat) params.set("category", searchCat);
     router.push(`/shop${params.toString() ? `?${params}` : ""}`);
   }
 
@@ -63,33 +61,21 @@ export default function Header({ categories }: { categories: CategoryNode[] }) {
         {/* Search (desktop) */}
         <form
           onSubmit={onSearch}
-          className="hidden flex-1 items-center overflow-hidden rounded-full border border-grey-300 focus-within:border-foreground lg:flex"
+          className="hidden flex-1 items-center overflow-hidden rounded-lg border border-grey-300 transition-colors focus-within:border-foreground lg:flex"
         >
+          <Search size={18} className="ml-4 shrink-0 text-grey-400" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search for products…"
-            className="flex-1 bg-transparent px-5 py-2.5 text-sm outline-none"
+            placeholder="What are you looking for?"
+            className="flex-1 bg-transparent px-3 py-3 text-sm outline-none placeholder:text-grey-400"
           />
-          <div className="flex items-center border-l border-grey-200">
-            <select
-              value={searchCat}
-              onChange={(e) => setSearchCat(e.target.value)}
-              className="max-w-[140px] cursor-pointer bg-transparent py-2.5 pl-3 pr-2 text-sm text-grey-600 outline-none"
-            >
-              <option value="">All Categories</option>
-              {categories.map((c) => (
-                <option key={c._id} value={c.slug}>{c.name}</option>
-              ))}
-            </select>
-            <button
-              type="submit"
-              className="flex h-11 w-12 items-center justify-center bg-accent text-white transition-colors hover:bg-accent-hover"
-              aria-label="Search"
-            >
-              <Search size={18} />
-            </button>
-          </div>
+          <button
+            type="submit"
+            className="self-stretch bg-foreground px-7 text-sm font-semibold text-white transition-colors hover:bg-grey-800"
+          >
+            Search
+          </button>
         </form>
 
         {/* Right actions */}
@@ -117,16 +103,17 @@ export default function Header({ categories }: { categories: CategoryNode[] }) {
       </div>
 
       {/* Search (mobile) */}
-      <form onSubmit={onSearch} className="flex items-center gap-2 px-4 pb-3 lg:hidden">
-        <div className="flex flex-1 items-center overflow-hidden rounded-full border border-grey-300">
+      <form onSubmit={onSearch} className="px-4 pb-3 lg:hidden">
+        <div className="flex items-center overflow-hidden rounded-lg border border-grey-300 focus-within:border-foreground">
+          <Search size={18} className="ml-3 shrink-0 text-grey-400" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search for products…"
-            className="flex-1 bg-transparent px-4 py-2.5 text-sm outline-none"
+            placeholder="What are you looking for?"
+            className="flex-1 bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-grey-400"
           />
-          <button type="submit" className="flex h-10 w-11 items-center justify-center bg-foreground text-white" aria-label="Search">
-            <Search size={18} />
+          <button type="submit" className="self-stretch bg-foreground px-5 text-sm font-semibold text-white">
+            Search
           </button>
         </div>
       </form>

@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { siteConfig } from "@/config/site";
 
 export interface CartItem {
   productId: string;
@@ -29,7 +30,14 @@ interface CartState {
   openCart: () => void;
   closeCart: () => void;
   count: () => number;
+  /** Sum of line prices, EXCLUDING VAT (product prices are stored ex-VAT). */
   subtotal: () => number;
+  /** VAT (20%) on the subtotal. */
+  vat: () => number;
+  /** Flat shipping & handling, charged once per order (0 when cart empty). */
+  shipping: () => number;
+  /** Grand total: subtotal + VAT + shipping. */
+  total: () => number;
 }
 
 export const useCart = create<CartState>()(
@@ -79,6 +87,12 @@ export const useCart = create<CartState>()(
 
       count: () => get().items.reduce((n, i) => n + i.quantity, 0),
       subtotal: () => get().items.reduce((s, i) => s + i.price * i.quantity, 0),
+      vat: () => get().subtotal() * siteConfig.vatRate,
+      shipping: () => (get().items.length > 0 ? siteConfig.shippingFee : 0),
+      total: () => {
+        const sub = get().subtotal();
+        return sub + sub * siteConfig.vatRate + (get().items.length > 0 ? siteConfig.shippingFee : 0);
+      },
     }),
     {
       name: "ulh-cart",

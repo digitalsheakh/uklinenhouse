@@ -5,10 +5,10 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import { useCart } from "@/store/cart";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, vatPercent } from "@/lib/utils";
 
 export default function CartDrawer() {
-  const { items, isOpen, closeCart, removeItem, updateQuantity, subtotal } = useCart();
+  const { items, isOpen, closeCart, removeItem, updateQuantity, subtotal, vat, shipping, total } = useCart();
 
   // Load the saved cart from localStorage after mount (persist uses
   // skipHydration) so the server and first client render always match.
@@ -79,7 +79,7 @@ export default function CartDrawer() {
                         {item.variantLabel && (
                           <span className="mt-0.5 text-xs text-grey-400">{item.variantLabel}</span>
                         )}
-                        <span className="mt-1 text-sm text-grey-500">{formatPrice(item.price)}</span>
+                        <span className="mt-1 text-sm text-grey-500">{formatPrice(item.price)} <span className="text-xs text-grey-400">ex VAT</span></span>
                         <div className="mt-auto flex items-center justify-between">
                           <div className="flex items-center rounded-full border border-grey-200">
                             <button
@@ -112,9 +112,23 @@ export default function CartDrawer() {
                 </div>
 
                 <div className="border-t border-grey-200 px-5 py-4">
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="text-sm text-grey-500">Subtotal</span>
-                    <span className="text-base font-semibold">{formatPrice(subtotal())}</span>
+                  <div className="mb-3 space-y-1.5">
+                    <div className="flex items-center justify-between text-sm text-grey-500">
+                      <span>Subtotal (ex VAT)</span>
+                      <span>{formatPrice(subtotal())}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm text-grey-500">
+                      <span>VAT ({vatPercent}%)</span>
+                      <span>{formatPrice(vat())}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm text-grey-500">
+                      <span>Shipping &amp; handling</span>
+                      <span>{formatPrice(shipping())}</span>
+                    </div>
+                    <div className="flex items-center justify-between border-t border-grey-200 pt-2 text-base font-semibold text-foreground">
+                      <span>Total</span>
+                      <span>{formatPrice(total())}</span>
+                    </div>
                   </div>
                   <Link
                     href="/checkout"
@@ -123,7 +137,9 @@ export default function CartDrawer() {
                   >
                     Checkout
                   </Link>
-                  <p className="mt-2 text-center text-xs text-grey-400">Shipping calculated at checkout</p>
+                  <p className="mt-2 text-center text-xs text-grey-400">
+                    Prices exclude VAT. {vatPercent}% VAT and {formatPrice(shipping() || 7.5)} shipping included in the total above.
+                  </p>
                 </div>
               </>
             )}

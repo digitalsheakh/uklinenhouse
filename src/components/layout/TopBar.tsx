@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Download, Truck, Tag } from "lucide-react";
+import { BookOpen, Truck, Tag } from "lucide-react";
 import { siteConfig } from "@/config/site";
 
 /**
@@ -13,15 +13,13 @@ export default function TopBar() {
         <p className="hidden truncate text-grey-300 sm:block">{siteConfig.topBar.message}</p>
 
         <div className="flex flex-1 items-center justify-between gap-4 sm:flex-none sm:justify-end">
-          <a
-            href={siteConfig.topBar.brochureUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/brochure"
             className="inline-flex items-center gap-1.5 text-grey-200 transition-colors hover:text-white"
           >
-            <Download size={14} /> <span className="hidden xs:inline sm:inline">Download Brochure</span>
+            <BookOpen size={14} /> <span className="hidden xs:inline sm:inline">View Brochure</span>
             <span className="xs:hidden sm:hidden">Brochure</span>
-          </a>
+          </Link>
 
           <Link
             href="/track-order"

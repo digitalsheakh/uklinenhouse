@@ -2,12 +2,13 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ShoppingBag, Minus, Plus, Check, Truck, ShieldCheck, ChevronRight } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ShoppingBag, Minus, Plus, Check, Truck, ShieldCheck, ChevronRight, ChevronLeft, ZoomIn, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { FullProduct } from "@/lib/data";
 import { useCart } from "@/store/cart";
 import { formatPrice, formatPriceRange } from "@/lib/utils";
+import ProductAccordion from "./ProductAccordion";
 
 const isColour = (name: string) => /colou?r/i.test(name);
 
@@ -18,6 +19,7 @@ export default function ProductDetail({ product }: { product: FullProduct }) {
   const [selected, setSelected] = useState<Record<string, string>>({});
   const [qty, setQty] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
+  const [zoomed, setZoomed] = useState(false);
 
   // The variant matching all currently-selected options (only when every option chosen).
   const currentVariant = useMemo(() => {
@@ -32,7 +34,14 @@ export default function ProductDetail({ product }: { product: FullProduct }) {
   }, [selected, product, hasVariants]);
 
   const gallery = product.images.length ? product.images : [];
-  const displayImage = currentVariant?.image || gallery[activeImage] || gallery[0];
+  // When navigating with the arrows we always follow the gallery index; a
+  // selected variant image (if any) takes precedence only until the user navigates.
+  const displayImage = currentVariant?.image && activeImage === 0 ? currentVariant.image : gallery[activeImage] || gallery[0];
+
+  const step = (dir: number) => {
+    if (gallery.length < 2) return;
+    setActiveImage((i) => (i + dir + gallery.length) % gallery.length);
+  };
 
   const price = currentVariant ? currentVariant.price : product.price;
   const compareAt = currentVariant?.compareAtPrice ?? product.compareAtPrice;
@@ -46,6 +55,7 @@ export default function ProductDetail({ product }: { product: FullProduct }) {
 
   function selectValue(optName: string, value: string) {
     setSelected((s) => ({ ...s, [optName]: value }));
+    setActiveImage(0); // surface the variant image (or first gallery image) again
   }
 
   function handleAdd() {
@@ -101,24 +111,9 @@ export default function ProductDetail({ product }: { product: FullProduct }) {
 
       <div className="grid gap-10 lg:grid-cols-2">
         {/* Gallery */}
-        <div className="flex flex-col-reverse gap-4 sm:flex-row">
-          {gallery.length > 1 && (
-            <div className="flex gap-3 sm:flex-col">
-              {gallery.map((img, i) => (
-                <button
-                  key={img}
-                  onClick={() => setActiveImage(i)}
-                  className={`h-16 w-16 overflow-hidden rounded-lg border ${
-                    displayImage === img ? "border-foreground" : "border-grey-200"
-                  }`}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img} alt="" className="h-full w-full object-cover" />
-                </button>
-              ))}
-            </div>
-          )}
-          <div className="relative flex-1 overflow-hidden rounded-2xl bg-[#f3f1ee]">
+        <div className="flex flex-col gap-3 sm:flex-row-reverse">
+          {/* Main image */}
+          <div className="group relative flex-1 overflow-hidden rounded-2xl bg-[#f3f1ee]">
             <div className="aspect-square">
               {displayImage ? (
                 <motion.img
@@ -127,7 +122,8 @@ export default function ProductDetail({ product }: { product: FullProduct }) {
                   animate={{ opacity: 1 }}
                   src={displayImage}
                   alt={product.name}
-                  className="h-full w-full object-cover"
+                  onClick={() => setZoomed(true)}
+                  className="h-full w-full cursor-zoom-in object-cover"
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-grey-300">
@@ -135,7 +131,59 @@ export default function ProductDetail({ product }: { product: FullProduct }) {
                 </div>
               )}
             </div>
+
+            {gallery.length > 1 && (
+              <>
+                {/* Prev / next arrows */}
+                <button
+                  onClick={() => step(-1)}
+                  aria-label="Previous image"
+                  className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-foreground shadow-md backdrop-blur transition hover:bg-white sm:opacity-0 sm:group-hover:opacity-100"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <button
+                  onClick={() => step(1)}
+                  aria-label="Next image"
+                  className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-foreground shadow-md backdrop-blur transition hover:bg-white sm:opacity-0 sm:group-hover:opacity-100"
+                >
+                  <ChevronRight size={20} />
+                </button>
+                {/* Position counter */}
+                <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/55 px-2.5 py-0.5 text-xs font-medium text-white">
+                  {activeImage + 1} / {gallery.length}
+                </span>
+              </>
+            )}
+
+            {displayImage && (
+              <button
+                onClick={() => setZoomed(true)}
+                aria-label="Zoom image"
+                className="absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-foreground shadow-md backdrop-blur transition hover:bg-white"
+              >
+                <ZoomIn size={18} />
+              </button>
+            )}
           </div>
+
+          {/* Thumbnails — a row on mobile, a column on desktop */}
+          {gallery.length > 1 && (
+            <div className="no-scrollbar flex gap-3 overflow-x-auto sm:flex-col sm:overflow-visible">
+              {gallery.map((img, i) => (
+                <button
+                  key={img}
+                  onClick={() => setActiveImage(i)}
+                  className={`h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition ${
+                    displayImage === img ? "border-foreground" : "border-grey-200 hover:border-grey-400"
+                  }`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img} alt="" className="h-full w-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Details */}
@@ -151,10 +199,16 @@ export default function ProductDetail({ product }: { product: FullProduct }) {
                 ? formatPrice(price)
                 : formatPriceRange(product.price, product.priceMax)}
             </span>
+            <span className="rounded-full bg-grey-100 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-grey-500">
+              Ex VAT
+            </span>
             {discounted && (
               <span className="text-base text-grey-400 line-through">{formatPrice(compareAt!)}</span>
             )}
           </div>
+          <p className="mt-1.5 text-xs text-grey-400">
+            VAT and shipping are calculated at checkout.
+          </p>
 
           {/* Options */}
           {product.options.map((opt) => (
@@ -238,18 +292,39 @@ export default function ProductDetail({ product }: { product: FullProduct }) {
             )}
           </div>
 
-          {/* Description (supports HTML written in the admin) */}
-          {product.description && (
-            <div className="mt-8 border-t border-grey-200 pt-6">
-              <h2 className="mb-2 text-sm font-semibold text-foreground">Description</h2>
-              <div
-                className="rich-text"
-                dangerouslySetInnerHTML={{ __html: product.description }}
-              />
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Collapsible info sections (About / Delivery / Reviews / Q&A / FBT) */}
+      <ProductAccordion product={product} />
+
+      {/* Full-screen zoom */}
+      <AnimatePresence>
+        {zoomed && displayImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setZoomed(false)}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
+          >
+            <button
+              onClick={() => setZoomed(false)}
+              aria-label="Close"
+              className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25"
+            >
+              <X size={22} />
+            </button>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={displayImage}
+              alt={product.name}
+              onClick={(e) => e.stopPropagation()}
+              className="max-h-full max-w-full rounded-lg object-contain"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
