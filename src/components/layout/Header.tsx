@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -15,6 +16,22 @@ export default function Header({ categories }: { categories: CategoryNode[] }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [hidden, setHidden] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // The mobile menu is portalled to <body> so the header's hide-on-scroll
+  // transform never becomes its containing block (which would clip the
+  // fixed overlay to the header's height). Portals need a mounted client.
+  useEffect(() => setMounted(true), []);
+
+  // Lock body scroll while the mobile menu is open.
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [mobileOpen]);
 
   // Hide the header when scrolling down, reveal it when scrolling up.
   useEffect(() => {
@@ -40,7 +57,7 @@ export default function Header({ categories }: { categories: CategoryNode[] }) {
     router.push(`/shop${params.toString() ? `?${params}` : ""}`);
   }
 
-  return (
+  const header = (
     <header
       className={`sticky top-0 z-50 w-full border-b border-grey-200 bg-white transition-transform duration-300 ease-out ${
         hidden ? "-translate-y-full" : "translate-y-0"
@@ -138,11 +155,21 @@ export default function Header({ categories }: { categories: CategoryNode[] }) {
         </nav>
       </div>
 
-      {/* Mobile menu */}
-      <AnimatePresence>
-        {mobileOpen && <MobileMenu categories={categories} onClose={() => setMobileOpen(false)} />}
-      </AnimatePresence>
     </header>
+  );
+
+  return (
+    <>
+      {header}
+      {/* Mobile menu — portalled to <body> so it escapes the header's transform. */}
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {mobileOpen && <MobileMenu categories={categories} onClose={() => setMobileOpen(false)} />}
+          </AnimatePresence>,
+          document.body
+        )}
+    </>
   );
 }
 
@@ -162,6 +189,23 @@ function MobileMenu({ categories, onClose }: { categories: CategoryNode[]; onClo
         <div className="mb-6 flex items-center justify-between">
           <Logo />
           <button onClick={onClose} aria-label="Close menu" className="text-grey-700"><X size={24} /></button>
+        </div>
+
+        <div className="mb-5 grid grid-cols-2 gap-3">
+          <Link
+            href="/account"
+            onClick={onClose}
+            className="flex items-center justify-center gap-2 rounded-lg border border-grey-200 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-grey-50"
+          >
+            <User size={17} /> Account
+          </Link>
+          <Link
+            href="/wishlist"
+            onClick={onClose}
+            className="flex items-center justify-center gap-2 rounded-lg border border-grey-200 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-grey-50"
+          >
+            <Heart size={17} /> Saved
+          </Link>
         </div>
 
         <nav className="flex flex-col">

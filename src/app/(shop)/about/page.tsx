@@ -152,7 +152,7 @@ export default function AboutPage() {
 
         <p className="mt-8 text-center text-xs text-grey-400">
           {siteConfig.name} · Family run business established 2013 · Bedford, Bedfordshire · Company
-          registration number 12030695
+          registration number 15946655
         </p>
       </section>
     </div>

@@ -22,7 +22,10 @@ export default function TopCategories() {
       </h2>
 
       {/* Horizontal scroller — scrolls left↔right on mobile, centres on desktop */}
-      <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 sm:gap-10 md:gap-12 lg:mx-0 lg:justify-center lg:px-0">
+      <div
+        className="no-scrollbar -mx-4 flex snap-x snap-proximity gap-6 overflow-x-auto px-4 [-webkit-overflow-scrolling:touch] sm:gap-10 md:gap-12 lg:mx-0 lg:flex-wrap lg:justify-center lg:px-0"
+        style={{ touchAction: "pan-x pan-y" }}
+      >
         {categories.map((c) => (
           <Link
             key={c.slug}

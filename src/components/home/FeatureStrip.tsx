@@ -35,11 +35,15 @@ const features: Feature[] = [
 export default function FeatureStrip() {
   return (
     <section className="border-y border-grey-200 bg-grey-50">
-      <div className="mx-auto grid max-w-[1400px] grid-cols-2 divide-grey-200 lg:grid-cols-4 lg:divide-x">
+      {/* Mobile: horizontal scroller of cards. Desktop: 4-column divided row. */}
+      <div
+        className="no-scrollbar mx-auto flex max-w-[1400px] snap-x snap-proximity gap-3 overflow-x-auto px-4 py-4 [-webkit-overflow-scrolling:touch] lg:grid lg:grid-cols-4 lg:gap-0 lg:divide-x lg:divide-grey-200 lg:overflow-visible lg:px-0 lg:py-0"
+        style={{ touchAction: "pan-x pan-y" }}
+      >
         {features.map((f) => (
           <div
             key={f.title}
-            className="flex items-center justify-center gap-3 px-4 py-5 text-left"
+            className="flex min-w-[230px] shrink-0 snap-start items-center gap-3 rounded-xl border border-grey-200 bg-white px-4 py-4 text-left sm:min-w-[250px] lg:min-w-0 lg:justify-center lg:rounded-none lg:border-0 lg:bg-transparent lg:py-5"
           >
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent-50 text-accent">
               {f.kind === "flag" ? (

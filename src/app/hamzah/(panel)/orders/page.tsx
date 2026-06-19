@@ -9,6 +9,7 @@ async function getOrders() {
     const orders = await Order.find().sort({ createdAt: -1 }).limit(100).lean();
     return orders.map((o) => ({
       _id: String(o._id),
+      orderNumber: o.orderNumber || `LN-${String(o._id).slice(-6).toUpperCase()}`,
       name: o.customer?.name || "—",
       email: o.customer?.email || "—",
       total: o.total,
@@ -40,6 +41,7 @@ export default async function OrdersPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-grey-200 text-left text-xs uppercase tracking-wide text-grey-400">
+                <th className="px-4 py-3 font-medium">Order</th>
                 <th className="px-4 py-3 font-medium">Customer</th>
                 <th className="hidden px-4 py-3 font-medium sm:table-cell">Email</th>
                 <th className="px-4 py-3 font-medium">Total</th>
@@ -50,6 +52,7 @@ export default async function OrdersPage() {
             <tbody>
               {orders.map((o) => (
                 <tr key={o._id} className="border-b border-grey-100 last:border-0">
+                  <td className="px-4 py-3 font-mono text-xs font-semibold text-foreground">{o.orderNumber}</td>
                   <td className="px-4 py-3 font-medium text-foreground">{o.name}</td>
                   <td className="hidden px-4 py-3 text-grey-500 sm:table-cell">{o.email}</td>
                   <td className="px-4 py-3">{formatPrice(o.total)}</td>

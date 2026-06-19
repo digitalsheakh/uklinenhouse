@@ -103,6 +103,20 @@ export async function getBestQualityProducts(limit = 8): Promise<ProductCard[]> 
   }
 }
 
+/** Get the admin-curated "All Products" selection for the homepage. */
+export async function getHomepageProducts(limit = 6): Promise<ProductCard[]> {
+  try {
+    await connectDB();
+    const products = await Product.find({ isActive: true, showOnHomepage: true })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+    return products.map((p) => toCard(p as unknown as Record<string, unknown>));
+  } catch {
+    return [];
+  }
+}
+
 /** Get latest products. */
 export async function getLatestProducts(limit = 8): Promise<ProductCard[]> {
   try {

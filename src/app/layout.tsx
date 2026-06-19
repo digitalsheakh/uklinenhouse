@@ -16,6 +16,11 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  icons: {
+    icon: "/uk-linen-house-fav-icon.png",
+    shortcut: "/uk-linen-house-fav-icon.png",
+    apple: "/uk-linen-house-fav-icon.png",
+  },
 };
 
 export default function RootLayout({

@@ -38,6 +38,7 @@ export interface IProduct {
   variants: IProductVariant[];
   featured: boolean;
   bestQuality: boolean;
+  showOnHomepage: boolean; // appears in the homepage "All Products" section
   isActive: boolean;
   // ---- SEO ----
   metaTitle?: string;
@@ -92,6 +93,7 @@ const ProductSchema = new Schema<IProduct>(
     variants: { type: [VariantSchema], default: [] },
     featured: { type: Boolean, default: false },
     bestQuality: { type: Boolean, default: false },
+    showOnHomepage: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     // ---- SEO ----
     metaTitle: { type: String, default: "" },

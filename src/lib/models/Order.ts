@@ -10,6 +10,7 @@ export interface IOrderItem {
 
 export interface IOrder {
   _id: Types.ObjectId;
+  orderNumber: string; // human-friendly, e.g. "LN-001"
   items: IOrderItem[];
   subtotal: number;
   total: number;
@@ -42,6 +43,7 @@ const OrderItemSchema = new Schema<IOrderItem>(
 
 const OrderSchema = new Schema<IOrder>(
   {
+    orderNumber: { type: String, unique: true, sparse: true, index: true },
     items: { type: [OrderItemSchema], default: [] },
     subtotal: { type: Number, required: true },
     total: { type: Number, required: true },

@@ -6,7 +6,13 @@ import { Loader2, ChevronLeft, ChevronRight, Download, BookOpen } from "lucide-r
 
 type Dims = { w: number; h: number };
 
-export default function BrochureFlipbook({ url }: { url: string }) {
+export default function BrochureFlipbook({
+  url,
+  label = "brochure",
+}: {
+  url: string;
+  label?: string;
+}) {
   const [pages, setPages] = useState<string[]>([]);
   const [dims, setDims] = useState<Dims | null>(null);
   const [progress, setProgress] = useState({ done: 0, total: 0 });
@@ -65,7 +71,7 @@ export default function BrochureFlipbook({ url }: { url: string }) {
     return (
       <div className="mx-auto max-w-md rounded-2xl border border-grey-200 bg-white p-8 text-center">
         <BookOpen size={36} className="mx-auto text-grey-300" />
-        <p className="mt-3 text-sm font-medium text-foreground">We couldn&apos;t open the brochure here.</p>
+        <p className="mt-3 text-sm font-medium text-foreground">We couldn&apos;t open the {label} here.</p>
         <p className="mt-1 text-xs text-grey-500">{error}</p>
         <a
           href={url}
@@ -84,7 +90,7 @@ export default function BrochureFlipbook({ url }: { url: string }) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-grey-500">
         <Loader2 size={32} className="animate-spin" />
-        <p className="mt-4 text-sm font-medium">Preparing your brochure…</p>
+        <p className="mt-4 text-sm font-medium">Preparing your {label}…</p>
         {progress.total > 0 && (
           <div className="mt-3 h-1.5 w-48 overflow-hidden rounded-full bg-grey-200">
             <div className="h-full bg-accent transition-all" style={{ width: `${pct}%` }} />
@@ -118,7 +124,7 @@ export default function BrochureFlipbook({ url }: { url: string }) {
           {pages.map((src, i) => (
             <div key={i} className="overflow-hidden bg-white shadow-inner">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt={`Brochure page ${i + 1}`} className="h-full w-full object-contain" />
+              <img src={src} alt={`${label} page ${i + 1}`} className="h-full w-full object-contain" />
             </div>
           ))}
         </HTMLFlipBook>

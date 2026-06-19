@@ -8,11 +8,13 @@ import {
   LayoutDashboard,
   FolderTree,
   Package,
+  Home,
   Star,
   Award,
   Tag,
   ShoppingCart,
   Users,
+  Settings,
   LogOut,
   Menu,
   X,
@@ -25,11 +27,13 @@ const nav = [
   { href: "/hamzah", label: "Dashboard", icon: LayoutDashboard },
   { href: "/hamzah/categories", label: "Categories", icon: FolderTree },
   { href: "/hamzah/products", label: "Products", icon: Package },
+  { href: "/hamzah/homepage", label: "Homepage", icon: Home },
   { href: "/hamzah/featured", label: "Featured", icon: Star },
   { href: "/hamzah/best-quality", label: "Best Quality", icon: Award },
   { href: "/hamzah/sale", label: "Sale", icon: Tag },
   { href: "/hamzah/orders", label: "Orders", icon: ShoppingCart },
   { href: "/hamzah/customers", label: "Customers", icon: Users },
+  { href: "/hamzah/settings", label: "Settings", icon: Settings },
 ];
 
 export default function AdminSidebar({ email }: { email: string }) {

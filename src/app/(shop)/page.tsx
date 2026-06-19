@@ -7,7 +7,7 @@ import SaleSection from "@/components/home/SaleSection";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
 import HeroSlider from "@/components/home/HeroSlider";
 import CategorySidebar from "@/components/layout/CategorySidebar";
-import { getCategoryTree, getSaleProducts, getLatestProducts, getFeaturedProducts, getBestQualityProducts } from "@/lib/data";
+import { getCategoryTree, getSaleProducts, getHomepageProducts, getFeaturedProducts, getBestQualityProducts } from "@/lib/data";
 import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
@@ -17,10 +17,10 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [categories, onSale, latest, featured, bestQuality] = await Promise.all([
+  const [categories, onSale, homeProducts, featured, bestQuality] = await Promise.all([
     getCategoryTree(),
     getSaleProducts(8),
-    getLatestProducts(8),
+    getHomepageProducts(6),
     getFeaturedProducts(12),
     getBestQualityProducts(12),
   ]);
@@ -51,8 +51,8 @@ export default async function HomePage() {
       {/* On Sale — admin-controlled via each product's Compare-at price */}
       <SaleSection products={onSale} />
 
-      {/* All Products */}
-      <FeaturedProducts title="All Products" products={latest} />
+      {/* All Products — admin-curated via each product's "Show on homepage" flag */}
+      <FeaturedProducts title="All Products" products={homeProducts} />
 
       {/* Best Quality — admin-controlled via each product's "Best Quality" flag */}
       <BestQualitySection products={bestQuality} />
