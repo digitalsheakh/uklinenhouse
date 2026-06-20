@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Phone, MapPin, BookOpen, ArrowRight } from "lucide-react";
+import { Mail, Phone, MapPin, BookOpen } from "lucide-react";
 import { FaFacebookF, FaInstagram, FaXTwitter, FaLinkedinIn } from "react-icons/fa6";
 import { siteConfig } from "@/config/site";
 import { CategoryNode } from "@/lib/data";
@@ -11,33 +11,6 @@ export default function Footer({ categories }: { categories: CategoryNode[] }) {
 
   return (
     <footer className="mt-20 border-t border-grey-200 bg-grey-50">
-
-      {/* ── Request Brochure band ─────────────────────────────────────── */}
-      <div className="border-b border-grey-200 bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 py-8 sm:px-6 sm:flex-row">
-          <div className="flex items-start gap-4">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent-50 text-accent">
-              <BookOpen size={22} />
-            </span>
-            <div>
-              <h3 className="text-base font-semibold text-foreground">
-                Request Our Product Brochure
-              </h3>
-              <p className="mt-0.5 max-w-md text-sm text-grey-500">
-                Get our full catalogue of premium linen, towels and workwear sent directly to
-                your inbox. Free, no obligation.
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/request-brochure"
-            className="group inline-flex shrink-0 items-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
-          >
-            Request Brochure
-            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
-      </div>
 
       {/* ── Main footer grid ─────────────────────────────────────────── */}
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
