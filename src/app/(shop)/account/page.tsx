@@ -72,6 +72,9 @@ export default async function AccountPage() {
         status: o.status,
         paymentStatus: o.paymentStatus,
         itemCount: (o.items || []).reduce((n, i) => n + i.quantity, 0),
+        courier: o.courier || "",
+        trackingNumber: o.trackingNumber || "",
+        trackingUrl: o.trackingUrl || "",
       }));
     }
   } catch {

@@ -36,6 +36,9 @@ export interface AccountOrder {
   status: string;
   paymentStatus: string;
   itemCount: number;
+  courier?: string;
+  trackingNumber?: string;
+  trackingUrl?: string;
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -166,37 +169,66 @@ export default function AccountDashboard({ user, orders }: { user: AccountUser; 
               </Link>
             </div>
           ) : (
-            <div className="mt-4 overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-grey-200 text-left text-xs uppercase tracking-wide text-grey-400">
-                    <th className="py-2 pr-4 font-medium">Order</th>
-                    <th className="hidden py-2 pr-4 font-medium sm:table-cell">Date</th>
-                    <th className="hidden py-2 pr-4 font-medium sm:table-cell">Items</th>
-                    <th className="py-2 pr-4 font-medium">Total</th>
-                    <th className="py-2 font-medium">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map((o) => (
-                    <tr key={o.ref} className="border-b border-grey-100 last:border-0">
-                      <td className="py-3 pr-4 font-mono text-xs font-semibold text-foreground">{o.ref}</td>
-                      <td className="hidden py-3 pr-4 text-grey-500 sm:table-cell">{o.date}</td>
-                      <td className="hidden py-3 pr-4 text-grey-500 sm:table-cell">{o.itemCount}</td>
-                      <td className="py-3 pr-4 text-foreground">{formatPrice(o.total)}</td>
-                      <td className="py-3">
-                        <span
-                          className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-medium capitalize ${
-                            STATUS_STYLES[o.status] || "bg-grey-100 text-grey-600"
-                          }`}
-                        >
-                          {o.status}
+            <div className="mt-4 space-y-3">
+              {orders.map((o) => {
+                const trackLink = o.trackingUrl || (
+                  o.courier === "evri" && o.trackingNumber
+                    ? `https://www.evri.com/track-a-parcel#/tracking/${o.trackingNumber}`
+                    : o.courier === "parcelforce" && o.trackingNumber
+                    ? `https://www.parcelforce.com/track-trace?trackNumber=${o.trackingNumber}`
+                    : o.courier === "dpd" && o.trackingNumber
+                    ? `https://track.dpd.co.uk/search?reference=${o.trackingNumber}`
+                    : null
+                );
+                const courierLabel: Record<string, string> = {
+                  evri: "Evri", parcelforce: "Parcel Force", dpd: "DPD", other: "Courier",
+                };
+                return (
+                  <div key={o.ref} className="rounded-xl border border-grey-200 bg-white p-4">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div>
+                        <span className="font-mono text-xs font-bold text-foreground">{o.ref}</span>
+                        <span className="ml-2 text-xs text-grey-400">{o.date}</span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium capitalize ${STATUS_STYLES[o.status] || "bg-grey-100 text-grey-600"}`}>
+                          {o.status.replace(/_/g, " ")}
                         </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        {o.paymentStatus === "paid" && (
+                          <span className="rounded-full bg-green-50 px-2 py-0.5 text-[11px] font-medium text-green-700">Paid</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm text-grey-500">
+                      <span>{o.itemCount} item{o.itemCount !== 1 ? "s" : ""}</span>
+                      <span className="font-semibold text-foreground">{formatPrice(o.total)}</span>
+                    </div>
+
+                    {/* Tracking info */}
+                    {o.trackingNumber && (
+                      <div className="mt-3 flex flex-wrap items-center gap-3 rounded-lg bg-purple-50 px-3 py-2.5">
+                        <Truck size={14} className="shrink-0 text-purple-600" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold text-purple-700">
+                            {o.courier ? `Dispatched via ${courierLabel[o.courier] || o.courier}` : "Dispatched"}
+                          </p>
+                          <p className="mt-0.5 font-mono text-xs text-purple-600">{o.trackingNumber}</p>
+                        </div>
+                        {trackLink && (
+                          <a
+                            href={trackLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="shrink-0 rounded-lg bg-purple-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-purple-700 transition-colors"
+                          >
+                            Track parcel
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </section>

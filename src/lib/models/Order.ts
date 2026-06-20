@@ -49,6 +49,10 @@ export interface IOrder {
     | "abandoned";
   paymentStatus: "unpaid" | "paid" | "refunded";
   stripeSessionId?: string;
+  courier?: "evri" | "parcelforce" | "dpd" | "other" | "";
+  trackingNumber?: string;
+  trackingUrl?: string;
+  adminNotes?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -121,6 +125,10 @@ const OrderSchema = new Schema<IOrder>(
       default: "unpaid",
     },
     stripeSessionId: { type: String, default: "" },
+    courier: { type: String, enum: ["evri", "parcelforce", "dpd", "other", ""], default: "" },
+    trackingNumber: { type: String, default: "" },
+    trackingUrl: { type: String, default: "" },
+    adminNotes: { type: String, default: "" },
   },
   { timestamps: true }
 );

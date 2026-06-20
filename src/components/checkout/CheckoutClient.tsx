@@ -210,6 +210,9 @@ export default function CheckoutClient({ initial }: { initial: InitialCustomer }
       <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
         <h1 className="text-3xl font-semibold tracking-tight text-foreground">Checkout</h1>
 
+        {/* Stripe test mode banner — only shown when using sandbox/test keys */}
+        <StripeTestBanner />
+
         <form onSubmit={onSubmit} className="mt-8 grid gap-8 lg:grid-cols-[1fr_400px]">
 
           {/* ── LEFT: Details ─────────────────────────────────────────────── */}
@@ -472,6 +475,58 @@ export default function CheckoutClient({ initial }: { initial: InitialCustomer }
           </aside>
         </form>
       </div>
+    </div>
+  );
+}
+
+/* ── Stripe test-mode helper ─────────────────────────────────────────────── */
+
+const TEST_CARDS = [
+  { label: "Visa (success)",         number: "4242 4242 4242 4242", expiry: "Any future", cvc: "Any 3 digits", color: "bg-green-50 border-green-200 text-green-800" },
+  { label: "Auth required",          number: "4000 0025 0000 3155", expiry: "Any future", cvc: "Any 3 digits", color: "bg-blue-50 border-blue-200 text-blue-800" },
+  { label: "Payment declined",       number: "4000 0000 0000 0002", expiry: "Any future", cvc: "Any 3 digits", color: "bg-red-50 border-red-200 text-red-700"   },
+  { label: "Insufficient funds",     number: "4000 0000 0000 9995", expiry: "Any future", cvc: "Any 3 digits", color: "bg-orange-50 border-orange-200 text-orange-800" },
+];
+
+function StripeTestBanner() {
+  const [open, setOpen] = useState(false);
+  // Only show when publishable key is a test key (pk_test_) — server-rendered env
+  const pubKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "";
+  if (!pubKey.startsWith("pk_test_")) return null;
+
+  return (
+    <div className="mt-4 overflow-hidden rounded-xl border border-amber-200 bg-amber-50">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center justify-between px-4 py-3 text-left"
+      >
+        <span className="flex items-center gap-2 text-sm font-semibold text-amber-800">
+          <span className="rounded bg-amber-200 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide">Test mode</span>
+          Stripe sandbox is active — use test card numbers below
+        </span>
+        <span className="text-amber-600 text-xs">{open ? "Hide" : "Show"}</span>
+      </button>
+      {open && (
+        <div className="border-t border-amber-200 px-4 pb-4 pt-3">
+          <p className="mb-3 text-xs text-amber-700">No real money is charged. Use any future date for expiry and any 3-digit CVC.</p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {TEST_CARDS.map((c) => (
+              <div key={c.number} className={`rounded-lg border p-3 ${c.color}`}>
+                <p className="text-xs font-semibold">{c.label}</p>
+                <p className="mt-1 font-mono text-sm tracking-wide">{c.number}</p>
+                <p className="mt-0.5 text-xs opacity-70">Exp: {c.expiry} · CVC: {c.cvc}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-amber-600">
+            Full list at{" "}
+            <a href="https://stripe.com/docs/testing#cards" target="_blank" rel="noopener noreferrer" className="underline">
+              stripe.com/docs/testing
+            </a>
+          </p>
+        </div>
+      )}
     </div>
   );
 }
