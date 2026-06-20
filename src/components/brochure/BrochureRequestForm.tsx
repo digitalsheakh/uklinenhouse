@@ -1,86 +1,82 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, CheckCircle2, BookOpen } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface FormState {
-  firstName: string;
-  lastName: string;
-  companyName: string;
-  jobTitle: string;
+  name: string;
   email: string;
   phone: string;
-  address: string;
+  customerType: "business" | "personal";
+  companyName: string;
+  streetAddress: string;
   city: string;
   postcode: string;
-  message: string;
+  deliveryMethod: "email" | "post";
+  callBack: "yes" | "no";
+  newsletter: boolean;
 }
 
-const EMPTY: FormState = {
-  firstName: "", lastName: "", companyName: "", jobTitle: "",
-  email: "", phone: "", address: "", city: "", postcode: "", message: "",
+const INIT: FormState = {
+  name: "", email: "", phone: "",
+  customerType: "business", companyName: "",
+  streetAddress: "", city: "", postcode: "",
+  deliveryMethod: "email", callBack: "no", newsletter: false,
 };
 
 export default function BrochureRequestForm() {
-  const [form, setForm] = useState<FormState>(EMPTY);
+  const [form, setForm] = useState<FormState>(INIT);
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [done, setDone] = useState(false);
 
-  const set = (k: keyof FormState) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  const str = (k: keyof FormState) => (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => setForm(f => ({ ...f, [k]: e.target.value }));
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (loading) return;
-
-    // Basic client validation
-    if (!form.firstName.trim() || !form.lastName.trim()) {
-      toast.error("Please enter your full name."); return;
-    }
-    if (!form.companyName.trim()) {
+    if (!form.name.trim()) { toast.error("Please enter your name."); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) { toast.error("Please enter a valid email."); return; }
+    if (form.customerType === "business" && !form.companyName.trim()) {
       toast.error("Please enter your company name."); return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      toast.error("Please enter a valid email address."); return;
-    }
-
     setLoading(true);
     try {
       const res = await fetch("/api/brochure-request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          firstName: form.name.split(" ")[0] || form.name,
+          lastName:  form.name.split(" ").slice(1).join(" ") || "-",
+          companyName: form.companyName || "Personal",
+          jobTitle:    "",
+          email:       form.email,
+          phone:       form.phone,
+          address:     form.streetAddress,
+          city:        form.city,
+          postcode:    form.postcode,
+          message:     `Customer type: ${form.customerType}. Delivery: ${form.deliveryMethod}. Call back: ${form.callBack}. Newsletter: ${form.newsletter ? "yes" : "no"}.`,
+        }),
       });
       const data = await res.json();
       if (!res.ok) { toast.error(data.error || "Something went wrong."); return; }
-      setSubmitted(true);
-    } catch {
-      toast.error("Network error. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+      setDone(true);
+    } catch { toast.error("Network error. Please try again."); }
+    finally { setLoading(false); }
   }
 
-  // Success screen
-  if (submitted) {
+  if (done) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-grey-200 bg-white p-10 text-center shadow-sm">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-50 text-green-600">
-          <CheckCircle2 size={36} />
-        </div>
-        <h3 className="mt-5 text-xl font-semibold tracking-tight text-foreground">
-          Request received!
-        </h3>
-        <p className="mx-auto mt-3 max-w-xs text-sm text-grey-600">
-          Thank you, <strong>{form.firstName}</strong>. We will send your brochure to{" "}
-          <span className="font-medium text-foreground">{form.email}</span> within one working day.
+      <div className="rounded-lg border border-grey-200 bg-grey-50 px-6 py-10 text-center">
+        <p className="text-base font-semibold text-foreground">Thank you, {form.name.split(" ")[0]}!</p>
+        <p className="mt-2 text-sm text-grey-600">
+          We have received your request and will send your brochure to{" "}
+          <strong>{form.email}</strong> within one working day.
         </p>
         <button
-          type="button"
-          onClick={() => { setForm(EMPTY); setSubmitted(false); }}
-          className="mt-6 text-sm font-medium text-accent hover:underline"
+          onClick={() => { setForm(INIT); setDone(false); }}
+          className="mt-5 text-sm font-medium text-accent hover:underline"
         >
           Submit another request
         </button>
@@ -89,152 +85,126 @@ export default function BrochureRequestForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-2xl border border-grey-200 bg-white p-6 shadow-sm sm:p-8"
-    >
-      <div className="mb-6 flex items-center gap-2.5">
-        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-50 text-accent">
-          <BookOpen size={17} />
-        </span>
-        <h3 className="text-base font-semibold text-foreground">Your Details</h3>
+    <form onSubmit={submit} className="space-y-5">
+
+      {/* Name */}
+      <Field label="Name" required>
+        <input type="text" value={form.name} onChange={str("name")}
+          autoComplete="name" required className={inp} />
+      </Field>
+
+      {/* Email */}
+      <Field label="E-mail" required>
+        <input type="email" value={form.email} onChange={str("email")}
+          autoComplete="email" required className={inp} />
+      </Field>
+
+      {/* Phone */}
+      <Field label="Phone">
+        <input type="tel" value={form.phone} onChange={str("phone")}
+          autoComplete="tel" className={inp} />
+      </Field>
+
+      {/* Customer Type */}
+      <Field label="Customer Type" required>
+        <div className="flex gap-6">
+          <Radio name="customerType" value="business" checked={form.customerType === "business"}
+            onChange={() => setForm(f => ({ ...f, customerType: "business" }))} label="Business" />
+          <Radio name="customerType" value="personal" checked={form.customerType === "personal"}
+            onChange={() => setForm(f => ({ ...f, customerType: "personal", deliveryMethod: "email" }))} label="Personal" />
+        </div>
+      </Field>
+
+      {/* Company Name — only when Business */}
+      {form.customerType === "business" && (
+        <Field label="Company Name" required>
+          <input type="text" value={form.companyName} onChange={str("companyName")}
+            autoComplete="organization" required className={inp} />
+        </Field>
+      )}
+
+      {/* Address */}
+      <Field label="Street Address">
+        <input type="text" value={form.streetAddress} onChange={str("streetAddress")}
+          autoComplete="street-address" className={inp} />
+      </Field>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Town / City">
+          <input type="text" value={form.city} onChange={str("city")}
+            autoComplete="address-level2" className={inp} />
+        </Field>
+        <Field label="Post Code">
+          <input type="text" value={form.postcode} onChange={str("postcode")}
+            autoComplete="postal-code" className={inp} />
+        </Field>
       </div>
 
-      <div className="space-y-4">
-        {/* Name row */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="First Name" required>
-            <input
-              type="text" value={form.firstName} onChange={set("firstName")}
-              placeholder="John" autoComplete="given-name" required
-              className={inputClass}
-            />
-          </Field>
-          <Field label="Last Name" required>
-            <input
-              type="text" value={form.lastName} onChange={set("lastName")}
-              placeholder="Smith" autoComplete="family-name" required
-              className={inputClass}
-            />
-          </Field>
-        </div>
-
-        {/* Company + job title */}
-        <Field label="Company Name" required>
-          <input
-            type="text" value={form.companyName} onChange={set("companyName")}
-            placeholder="e.g. The Grand Hotel" autoComplete="organization" required
-            className={inputClass}
-          />
-        </Field>
-        <Field label="Job Title" hint="Optional">
-          <input
-            type="text" value={form.jobTitle} onChange={set("jobTitle")}
-            placeholder="e.g. Purchasing Manager" autoComplete="organization-title"
-            className={inputClass}
-          />
-        </Field>
-
-        <div className="border-t border-grey-100 pt-2" />
-
-        {/* Contact */}
-        <Field label="Email Address" required>
-          <input
-            type="email" value={form.email} onChange={set("email")}
-            placeholder="john@company.co.uk" autoComplete="email" required
-            className={inputClass}
-          />
-        </Field>
-        <Field label="Phone Number" hint="Optional">
-          <input
-            type="tel" value={form.phone} onChange={set("phone")}
-            placeholder="+44 1234 567890" autoComplete="tel"
-            className={inputClass}
-          />
-        </Field>
-
-        <div className="border-t border-grey-100 pt-2" />
-
-        {/* Address */}
-        <Field label="Address" hint="Optional — so we can post a hard copy">
-          <input
-            type="text" value={form.address} onChange={set("address")}
-            placeholder="123 High Street" autoComplete="street-address"
-            className={inputClass}
-          />
-        </Field>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Town / City" hint="Optional">
-            <input
-              type="text" value={form.city} onChange={set("city")}
-              placeholder="Bedford" autoComplete="address-level2"
-              className={inputClass}
-            />
-          </Field>
-          <Field label="Postcode" hint="Optional">
-            <input
-              type="text" value={form.postcode} onChange={set("postcode")}
-              placeholder="MK41 7BJ" autoComplete="postal-code"
-              className={inputClass}
-            />
-          </Field>
-        </div>
-
-        <div className="border-t border-grey-100 pt-2" />
-
-        {/* Message */}
-        <Field label="Anything else you'd like to tell us?" hint="Optional">
-          <textarea
-            value={form.message} onChange={set("message")}
-            placeholder="e.g. interested in bulk pricing for towels…"
-            rows={3} maxLength={1000}
-            className={`${inputClass} resize-none`}
-          />
-          <p className="mt-1 text-right text-xs text-grey-400">{form.message.length}/1000</p>
-        </Field>
-
-        {/* Privacy */}
-        <p className="text-xs text-grey-400">
-          Your information is used only to process this brochure request and will not be sold
-          to third parties. See our{" "}
-          <a href="/privacy-policy" className="underline hover:text-foreground">privacy policy</a>.
-        </p>
-
-        {/* Submit */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent py-3.5 text-sm font-semibold text-white transition-colors hover:bg-accent-hover disabled:opacity-60"
-        >
-          {loading ? (
-            <><Loader2 size={16} className="animate-spin" /> Sending request…</>
-          ) : (
-            <><BookOpen size={16} /> Request Your Brochure</>
+      {/* Delivery method — post only for Business */}
+      <Field label="Receive brochure via" required>
+        <div className="flex gap-6">
+          <Radio name="delivery" value="email" checked={form.deliveryMethod === "email"}
+            onChange={() => setForm(f => ({ ...f, deliveryMethod: "email" }))} label="Email" />
+          {form.customerType === "business" && (
+            <Radio name="delivery" value="post" checked={form.deliveryMethod === "post"}
+              onChange={() => setForm(f => ({ ...f, deliveryMethod: "post" }))} label="Post" />
           )}
+        </div>
+      </Field>
+
+      {/* Call back */}
+      <Field label="Would you like a call back?">
+        <div className="flex gap-6">
+          <Radio name="callback" value="yes" checked={form.callBack === "yes"}
+            onChange={() => setForm(f => ({ ...f, callBack: "yes" }))} label="Yes" />
+          <Radio name="callback" value="no" checked={form.callBack === "no"}
+            onChange={() => setForm(f => ({ ...f, callBack: "no" }))} label="No" />
+        </div>
+      </Field>
+
+      {/* Newsletter */}
+      <label className="flex cursor-pointer items-center gap-2.5 select-none">
+        <input type="checkbox" checked={form.newsletter}
+          onChange={e => setForm(f => ({ ...f, newsletter: e.target.checked }))}
+          className="h-4 w-4 rounded border-grey-300 accent-accent" />
+        <span className="text-sm text-foreground">Sign Up for Newsletter</span>
+      </label>
+
+      {/* Submit */}
+      <div className="pt-2">
+        <button type="submit" disabled={loading}
+          className="inline-flex items-center gap-2 rounded-lg bg-accent px-8 py-3 text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-accent-hover disabled:opacity-60">
+          {loading ? <><Loader2 size={15} className="animate-spin" /> Submitting…</> : "Submit"}
         </button>
       </div>
+
     </form>
   );
 }
 
-const inputClass =
-  "w-full rounded-lg border border-grey-300 px-3 py-2.5 text-sm outline-none transition-colors focus:border-accent placeholder:text-grey-400";
+/* ── tiny helpers ───────────────────────────────────────────────────────── */
 
-function Field({
-  label, hint, required, children,
-}: {
-  label: string; hint?: string; required?: boolean; children: React.ReactNode;
-}) {
+const inp = "w-full rounded-md border border-grey-300 px-3 py-2.5 text-sm outline-none transition-colors focus:border-accent";
+
+function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <div>
-      <div className="mb-1.5 flex items-baseline gap-1.5">
-        <span className="text-sm font-medium text-foreground">
-          {label}
-          {required && <span className="ml-0.5 text-red-500"> *</span>}
-        </span>
-        {hint && <span className="text-xs text-grey-400">{hint}</span>}
-      </div>
+      <label className="mb-1.5 block text-sm font-medium text-foreground">
+        {label}{required && <span className="ml-0.5 text-red-500">*</span>}
+      </label>
       {children}
     </div>
+  );
+}
+
+function Radio({ name, value, checked, onChange, label }: {
+  name: string; value: string; checked: boolean; onChange: () => void; label: string;
+}) {
+  return (
+    <label className="flex cursor-pointer items-center gap-2 select-none text-sm text-foreground">
+      <input type="radio" name={name} value={value} checked={checked} onChange={onChange}
+        className="h-4 w-4 accent-accent" />
+      {label}
+    </label>
   );
 }
