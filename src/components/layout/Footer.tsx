@@ -85,7 +85,6 @@ export default function Footer({ categories }: { categories: CategoryNode[] }) {
             <ul className="mt-4 space-y-2.5">
               <li><Link href="/about" className="text-sm text-grey-500 hover:text-foreground">About Us</Link></li>
               <li><Link href="/contact" className="text-sm text-grey-500 hover:text-foreground">Contact</Link></li>
-              <li><Link href="/request-brochure" className="text-sm font-medium text-accent hover:text-accent-hover">Request Brochure</Link></li>
               <li><Link href="/brochure" className="text-sm text-grey-500 hover:text-foreground">View Brochure</Link></li>
               <li><Link href="/compliance-report" className="text-sm text-grey-500 hover:text-foreground">Compliance Report</Link></li>
               <li><Link href="/delivery-policy" className="text-sm text-grey-500 hover:text-foreground">Delivery Policy</Link></li>
