@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProductBySlug } from "@/lib/data";
+import { getProductBySlug, getProducts } from "@/lib/data";
 import { siteConfig } from "@/config/site";
 import ProductDetail from "@/components/product/ProductDetail";
+import RelatedProducts from "@/components/product/RelatedProducts";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -35,5 +36,18 @@ export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
   if (!product) notFound();
-  return <ProductDetail product={product} />;
+
+  const related = product.category?.slug
+    ? (await getProducts({ categorySlug: product.category.slug, limit: 9 }))
+        .filter((p) => p.slug !== product.slug)
+        .slice(0, 8)
+    : [];
+
+  return (
+    <>
+      <ProductDetail product={product} />
+      <RelatedProducts products={related} />
+    </>
+  );
 }
+

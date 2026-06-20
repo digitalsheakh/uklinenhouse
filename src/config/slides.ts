@@ -1,9 +1,9 @@
 /*
   =====================================================================
-  HOMEPAGE HERO SLIDER — edit your slides here.
+  HOMEPAGE HERO SLIDER, edit your slides here.
   Each slide: small label, heading, subtext, button, link, and a
   background image (files live in /public/slider-image).
-  Links are placeholders for now — wire them to real pages later.
+  Links are placeholders for now, wire them to real pages later.
   =====================================================================
 */
 
@@ -20,7 +20,7 @@ export const heroSlides: HeroSlide[] = [
   {
     label: "Luxury Hospitality Linen",
     heading: "Hotel Towels & Bath Linen",
-    subtext: "Premium terry cotton — soft, absorbent and built to last.",
+    subtext: "Premium terry cotton, soft, absorbent and built to last.",
     buttonText: "Shop Now",
     buttonLink: "/shop/bath-linen",
     image: "/slider-image/uk-linen-house-bath-linen-header.png",

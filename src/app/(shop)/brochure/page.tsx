@@ -8,7 +8,7 @@ const BROCHURE_URL = "/linen-house-brochure/Linen-House-brochure-2026.pdf";
 
 export const metadata: Metadata = {
   title: `Brochure | ${siteConfig.name}`,
-  description: "Browse the UK Linen House 2026 brochure — our full range of linen, towels and workwear.",
+  description: "Browse the UK Linen House 2026 brochure, our full range of linen, towels and workwear.",
   alternates: { canonical: "/brochure" },
 };
 
@@ -24,7 +24,7 @@ export default function BrochurePage() {
             Our Brochure
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-grey-600">
-            Flip through our full range of premium linen, towels and workwear — the same quality trusted by
+            Flip through our full range of premium linen, towels and workwear, the same quality trusted by
             hospitality businesses across the UK.
           </p>
         </div>

@@ -5,7 +5,7 @@ import { siteConfig } from "@/config/site";
 export const metadata: Metadata = {
   title: `Delivery Policy | ${siteConfig.name}`,
   description:
-    "Delivery information for UK Linen House — delivery areas, charges, timescales, failed deliveries and when risk in your goods passes to you.",
+    "Delivery information for UK Linen House, delivery areas, charges, timescales, failed deliveries and when risk in your goods passes to you.",
   alternates: { canonical: "/delivery-policy" },
 };
 

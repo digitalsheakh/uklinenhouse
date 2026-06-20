@@ -89,7 +89,7 @@ export default function ProductDetail({ product }: { product: FullProduct }) {
         qty
       );
     }
-    toast.success("Added to cart");
+    toast.success("Added to bag");
   }
 
   return (
@@ -167,7 +167,7 @@ export default function ProductDetail({ product }: { product: FullProduct }) {
             )}
           </div>
 
-          {/* Thumbnails — a row on mobile, a column on desktop */}
+          {/* Thumbnails, a row on mobile, a column on desktop */}
           {gallery.length > 1 && (
             <div className="no-scrollbar flex gap-3 overflow-x-auto sm:flex-col sm:overflow-visible">
               {gallery.map((img, i) => (
@@ -215,7 +215,7 @@ export default function ProductDetail({ product }: { product: FullProduct }) {
             <div key={opt.name} className="mt-6">
               <div className="mb-2 flex items-center gap-2 text-sm">
                 <span className="font-medium text-foreground">{opt.name}</span>
-                {selected[opt.name] && <span className="text-grey-500">— {selected[opt.name]}</span>}
+                {selected[opt.name] && <span className="text-grey-500">- {selected[opt.name]}</span>}
               </div>
 
               {isColour(opt.name) ? (
@@ -279,7 +279,7 @@ export default function ProductDetail({ product }: { product: FullProduct }) {
               className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-accent py-3.5 text-sm font-semibold text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
             >
               <ShoppingBag size={17} />
-              {inStock ? "Add to Cart" : "Out of Stock"}
+              {inStock ? "Add to Bag" : "Out of Stock"}
             </button>
           </div>
 

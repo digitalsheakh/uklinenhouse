@@ -1,7 +1,7 @@
 import mongoose, { Schema, model, models, Types } from "mongoose";
 
 /**
- * Singleton store settings — currently the Stripe payment configuration.
+ * Singleton store settings, currently the Stripe payment configuration.
  * There is only ever ONE document (see getSettings() in src/lib/settings.ts).
  * Secret values are stored server-side only and never returned to the browser.
  */
@@ -10,14 +10,14 @@ export interface ISettings {
   // Stripe
   stripeEnabled: boolean;
   stripePublishableKey: string; // safe to expose to the client
-  stripeSecretKey: string; // SECRET — server only
-  stripeWebhookSecret: string; // SECRET — server only
+  stripeSecretKey: string; // SECRET, server only
+  stripeWebhookSecret: string; // SECRET, server only
   // Email (order notifications via SMTP)
   emailEnabled: boolean;
   smtpHost: string;
   smtpPort: number;
   smtpUser: string;
-  smtpPass: string; // SECRET — server only
+  smtpPass: string; // SECRET, server only
   emailFrom: string; // "From" address shown on emails
   orderNotifyEmail: string; // where new-order alerts are sent (your inbox)
   createdAt: Date;

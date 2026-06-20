@@ -9,7 +9,7 @@ function mask(secret: string): string {
   return `••••••••${secret.slice(-4)}`;
 }
 
-// GET — current settings (secrets are masked, never returned in full).
+// GET, current settings (secrets are masked, never returned in full).
 export async function GET() {
   if (!(await getAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -37,7 +37,7 @@ export async function GET() {
   });
 }
 
-// PUT — update settings. Blank secret fields keep the existing value.
+// PUT, update settings. Blank secret fields keep the existing value.
 export async function PUT(req: NextRequest) {
   if (!(await getAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

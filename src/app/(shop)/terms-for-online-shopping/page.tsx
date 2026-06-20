@@ -5,7 +5,7 @@ import { siteConfig } from "@/config/site";
 export const metadata: Metadata = {
   title: `Terms & Conditions for Online Shopping | ${siteConfig.name}`,
   description:
-    "The terms and conditions that apply when you buy goods from UK Linen House online — orders, pricing, payment, delivery, cancellation and your consumer rights.",
+    "The terms and conditions that apply when you buy goods from UK Linen House online, orders, pricing, payment, delivery, cancellation and your consumer rights.",
   alternates: { canonical: "/terms-for-online-shopping" },
 };
 
@@ -67,8 +67,8 @@ export default function OnlineShoppingTermsPage() {
         We will deliver the goods to the delivery location by the agreed time or within the agreed period or,
         failing any agreement, without undue delay and in any event not more than 30 days after the day on
         which the contract is entered into. The goods will become your responsibility from the completion of
-        delivery or your collection. Full delivery terms — including delivery areas, charges and failed
-        deliveries — are set out in our <a href="/delivery-policy">Delivery Policy</a>.
+        delivery or your collection. Full delivery terms, including delivery areas, charges and failed
+        deliveries, are set out in our <a href="/delivery-policy">Delivery Policy</a>.
       </p>
 
       <h2>Risk and title</h2>

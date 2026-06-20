@@ -266,7 +266,7 @@ export default function VariantsEditor({
                     <select value={v.image}
                       onChange={(e) => updateVariant(i, "image", e.target.value)}
                       className="w-24 rounded border border-grey-200 px-2 py-1 outline-none focus:border-foreground">
-                      <option value="">—</option>
+                      <option value="">-</option>
                       {images.map((img, idx) => (
                         <option key={img} value={img}>Image {idx + 1}</option>
                       ))}
@@ -291,7 +291,7 @@ function ValueInput({ colour, onAdd }: { colour: boolean; onAdd: (val: string, s
   };
   return (
     <input
-      placeholder="+ add value(s), e.g. S, M, L — Enter to add"
+      placeholder="+ add value(s), e.g. S, M, L, Enter to add"
       className="min-w-[180px] flex-1 rounded-lg border border-dashed border-grey-300 px-2 py-1 text-xs outline-none focus:border-foreground"
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === ",") {

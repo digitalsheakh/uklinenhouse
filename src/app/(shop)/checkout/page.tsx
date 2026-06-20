@@ -35,7 +35,7 @@ export default async function CheckoutPage() {
         };
       }
     } catch {
-      // ignore — fall back to token basics
+      // ignore, fall back to token basics
     }
   }
 

@@ -32,7 +32,7 @@ export default function BrandStory() {
           </h2>
           <div className="mt-5 space-y-4 text-grey-600">
             <p>
-              UK Linen House began with a simple goal — to supply hospitality businesses and homes
+              UK Linen House began with a simple goal, to supply hospitality businesses and homes
               with premium linen, towels and workwear at honest prices. From cotton wet towels to
               luxury bath linen, every product is chosen for quality and durability.
             </p>

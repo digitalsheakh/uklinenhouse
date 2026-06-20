@@ -161,7 +161,7 @@ export default function Header({ categories }: { categories: CategoryNode[] }) {
   return (
     <>
       {header}
-      {/* Mobile menu — portalled to <body> so it escapes the header's transform. */}
+      {/* Mobile menu, portalled to <body> so it escapes the header's transform. */}
       {mounted &&
         createPortal(
           <AnimatePresence>

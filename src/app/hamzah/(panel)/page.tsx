@@ -36,7 +36,7 @@ export default async function AdminDashboard() {
       <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
-          <p className="mt-1 text-sm text-grey-500">Welcome back — here&apos;s your store at a glance.</p>
+          <p className="mt-1 text-sm text-grey-500">Welcome back, here&apos;s your store at a glance.</p>
         </div>
         <Link
           href="/hamzah/products/new"

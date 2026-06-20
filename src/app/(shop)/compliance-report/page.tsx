@@ -9,7 +9,7 @@ const REPORT_URL = "/compliance-report/Safety-Assessment-Report.pdf";
 export const metadata: Metadata = {
   title: `Compliance & Safety Report | ${siteConfig.name}`,
   description:
-    "Read the UK Linen House safety assessment and compliance report — independently verified standards behind our linen, towels and workwear, trusted by UK hospitality.",
+    "Read the UK Linen House safety assessment and compliance report, independently verified standards behind our linen, towels and workwear, trusted by UK hospitality.",
   alternates: { canonical: "/compliance-report" },
 };
 
@@ -25,7 +25,7 @@ export default function ComplianceReportPage() {
             Compliance & Safety Report
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-grey-600">
-            Flip through our independent safety assessment — the standards and testing that back the
+            Flip through our independent safety assessment, the standards and testing that back the
             quality trusted by hospitality businesses across the UK.
           </p>
         </div>

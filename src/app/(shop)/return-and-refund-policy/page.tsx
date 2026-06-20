@@ -5,7 +5,7 @@ import { siteConfig } from "@/config/site";
 export const metadata: Metadata = {
   title: `Return & Refund Policy | ${siteConfig.name}`,
   description:
-    "Our return and refund policy — return windows, eligibility, how to return an item, refunds, exchanges and damaged or defective goods.",
+    "Our return and refund policy, return windows, eligibility, how to return an item, refunds, exchanges and damaged or defective goods.",
   alternates: { canonical: "/return-and-refund-policy" },
 };
 

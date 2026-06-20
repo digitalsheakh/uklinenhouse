@@ -19,6 +19,8 @@ import {
   Menu,
   X,
   ExternalLink,
+  Ticket,
+  Clock,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
@@ -32,6 +34,8 @@ const nav = [
   { href: "/hamzah/best-quality", label: "Best Quality", icon: Award },
   { href: "/hamzah/sale", label: "Sale", icon: Tag },
   { href: "/hamzah/orders", label: "Orders", icon: ShoppingCart },
+  { href: "/hamzah/waiting-payment", label: "Waiting Payment", icon: Clock },
+  { href: "/hamzah/coupons", label: "Coupons", icon: Ticket },
   { href: "/hamzah/customers", label: "Customers", icon: Users },
   { href: "/hamzah/settings", label: "Settings", icon: Settings },
 ];
@@ -55,7 +59,7 @@ export default function AdminSidebar({ email }: { email: string }) {
     <>
       {/* Mobile top bar */}
       <div className="fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b border-grey-200 bg-white px-4 py-3 lg:hidden">
-        <span className="text-sm font-semibold tracking-wide">UK LINEN — Admin</span>
+        <span className="text-sm font-semibold tracking-wide">UK LINEN, Admin</span>
         <button onClick={() => setOpen(true)} aria-label="Open menu">
           <Menu size={22} />
         </button>

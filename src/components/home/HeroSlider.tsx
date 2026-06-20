@@ -20,7 +20,7 @@ export default function HeroSlider() {
 
   return (
     <div className="relative h-[400px] overflow-hidden rounded-2xl bg-grey-50 shadow-sm ring-1 ring-grey-200 sm:h-[480px] lg:h-[560px]">
-      {/* Slides — text on the left, full product image on the right */}
+      {/* Slides, text on the left, full product image on the right */}
       {heroSlides.map((slide, i) => (
         <div
           key={i}
@@ -30,7 +30,7 @@ export default function HeroSlider() {
           }`}
         >
           <div className="flex h-full">
-            {/* Text — left */}
+            {/* Text, left */}
             <div className="flex w-[52%] flex-col justify-center pl-5 pr-2 sm:w-1/2 sm:pl-10 sm:pr-4 lg:pl-14">
               {slide.label && (
                 <span className="mb-2.5 w-fit text-[10px] font-bold uppercase tracking-[0.16em] text-accent sm:mb-3 sm:text-xs">
@@ -55,7 +55,7 @@ export default function HeroSlider() {
               </div>
             </div>
 
-            {/* Image — right (full image, never cropped) */}
+            {/* Image, right (full image, never cropped) */}
             <div className="flex w-[48%] items-center justify-center p-3 sm:w-1/2 sm:p-8">
               <Image
                 src={slide.image}

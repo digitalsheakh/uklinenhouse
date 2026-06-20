@@ -5,7 +5,7 @@ import { Toaster } from "react-hot-toast";
 
 /**
  * Global client-side providers: toast notifications.
- * (Native browser scrolling — no smooth-scroll inertia.)
+ * (Native browser scrolling, no smooth-scroll inertia.)
  */
 export default function Providers({ children }: { children: ReactNode }) {
   return (

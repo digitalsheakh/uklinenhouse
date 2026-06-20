@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import { useCart } from "@/store/cart";
 import { formatPrice, vatPercent } from "@/lib/utils";
+import FreeDeliveryBar from "./FreeDeliveryBar";
 
 export default function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQuantity, subtotal, vat, shipping, total } = useCart();
@@ -35,7 +36,7 @@ export default function CartDrawer() {
           >
             <div className="flex items-center justify-between border-b border-grey-200 px-5 py-4">
               <h2 className="flex items-center gap-2 text-base font-semibold">
-                <ShoppingBag size={18} /> Your Cart
+                <ShoppingBag size={18} /> Your Bag
               </h2>
               <button onClick={closeCart} aria-label="Close cart" className="text-grey-500 hover:text-foreground">
                 <X size={22} />
@@ -45,7 +46,7 @@ export default function CartDrawer() {
             {items.length === 0 ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
                 <ShoppingBag size={40} className="text-grey-300" />
-                <p className="text-sm text-grey-500">Your cart is empty.</p>
+                <p className="text-sm text-grey-500">Your bag is empty.</p>
                 <button
                   onClick={closeCart}
                   className="mt-2 rounded-full bg-foreground px-6 py-2.5 text-sm font-medium text-white hover:bg-accent-hover"
@@ -112,6 +113,9 @@ export default function CartDrawer() {
                 </div>
 
                 <div className="border-t border-grey-200 px-5 py-4">
+                  <div className="mb-3">
+                    <FreeDeliveryBar subtotal={subtotal()} />
+                  </div>
                   <div className="mb-3 space-y-1.5">
                     <div className="flex items-center justify-between text-sm text-grey-500">
                       <span>Subtotal (ex VAT)</span>
@@ -123,7 +127,7 @@ export default function CartDrawer() {
                     </div>
                     <div className="flex items-center justify-between text-sm text-grey-500">
                       <span>Shipping &amp; handling</span>
-                      <span>{formatPrice(shipping())}</span>
+                      <span>{shipping() === 0 ? <span className="font-semibold text-green-700">FREE</span> : formatPrice(shipping())}</span>
                     </div>
                     <div className="flex items-center justify-between border-t border-grey-200 pt-2 text-base font-semibold text-foreground">
                       <span>Total</span>

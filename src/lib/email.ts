@@ -96,7 +96,7 @@ function escapeHtml(s: string) {
 
 /**
  * Send order emails: a notification to the store owner and a confirmation to
- * the customer. Never throws — email problems must not break the order flow.
+ * the customer. Never throws, email problems must not break the order flow.
  * Returns true if at least one email was sent.
  */
 export async function sendNewOrderEmails(order: OrderEmailData): Promise<boolean> {
@@ -115,7 +115,7 @@ export async function sendNewOrderEmails(order: OrderEmailData): Promise<boolean
           from,
           to: cfg.notifyEmail,
           replyTo: order.customer.email,
-          subject: `New order ${order.orderNumber} — ${money(order.total)}`,
+          subject: `New order ${order.orderNumber}, ${money(order.total)}`,
           html: orderHtml(
             order,
             `New order received: ${order.orderNumber}`,

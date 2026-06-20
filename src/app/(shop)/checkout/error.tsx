@@ -22,7 +22,7 @@ export default function CheckoutError({
       </div>
       <h1 className="mt-5 text-2xl font-semibold text-foreground">Something went wrong</h1>
       <p className="mt-2 text-sm text-grey-500">
-        We hit a problem loading checkout. Your cart is safe — please try again.
+        We hit a problem loading checkout. Your cart is safe, please try again.
         {" "}If you were charged, you won&apos;t be charged again.
       </p>
       <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">

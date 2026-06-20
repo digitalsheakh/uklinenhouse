@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description:
     "Sign in or create an account to manage your orders, delivery addresses and details with UK Linen House.",
   alternates: { canonical: "/account" },
-  robots: { index: false }, // private area — keep out of search results
+  robots: { index: false }, // private area, keep out of search results
 };
 
 // Reads the auth cookie, so this page must render per-request.
@@ -54,7 +54,7 @@ export default async function AccountPage() {
           : null,
       };
 
-      // Order history — matched to the customer's email.
+      // Order history, matched to the customer's email.
       const docs = await Order.find({ "customer.email": doc.email })
         .sort({ createdAt: -1 })
         .limit(20)
@@ -75,7 +75,7 @@ export default async function AccountPage() {
       }));
     }
   } catch {
-    // DB unreachable — fall back to the basics carried in the auth token
+    // DB unreachable, fall back to the basics carried in the auth token
     // so a signed-in user still sees their account rather than an error.
   }
 

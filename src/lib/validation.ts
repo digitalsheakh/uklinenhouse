@@ -11,6 +11,14 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
+const shippingAddressSchema = z.object({
+  name: z.string().max(120).optional().default(""),
+  address: z.string().min(3, "Enter the delivery address").max(200),
+  city: z.string().min(2, "Enter the town/city").max(100),
+  postcode: z.string().min(3, "Enter the postcode").max(20),
+  country: z.string().min(2).max(80).default("United Kingdom"),
+});
+
 export const checkoutSchema = z.object({
   items: z
     .array(
@@ -20,15 +28,58 @@ export const checkoutSchema = z.object({
         quantity: z.number().int().min(1).max(999),
       })
     )
-    .min(1, "Your cart is empty"),
+    .min(1, "Your bag is empty"),
   customer: z.object({
     name: z.string().min(2, "Please enter your full name").max(120),
     email: z.string().email("Enter a valid email"),
     phone: z.string().min(6, "Enter a contact phone number").max(40),
+    company: z.string().max(120).optional().default(""),
     address: z.string().min(3, "Enter your address").max(200),
     city: z.string().min(2, "Enter your town/city").max(100),
     postcode: z.string().min(3, "Enter your postcode").max(20),
     country: z.string().min(2).max(80).default("United Kingdom"),
+  }),
+  shippingAddress: shippingAddressSchema.optional(),
+  notes: z.string().max(1000).optional().default(""),
+  couponCode: z.string().max(40).optional().default(""),
+  marketingOptIn: z.boolean().optional().default(false),
+  paymentMethod: z.enum(["card", "bank_transfer"]).default("card"),
+  agreeTerms: z.literal(true).refine((v) => v === true, { message: "Please accept the terms and conditions." }),
+});
+
+export const couponApplySchema = z.object({
+  code: z.string().min(1, "Enter a coupon code").max(40),
+  subtotal: z.number().min(0),
+});
+
+export const adminCouponSchema = z.object({
+  code: z.string().min(2, "Code is required").max(40),
+  type: z.enum(["percent", "fixed"]).default("percent"),
+  value: z.coerce.number().min(0, "Value must be 0 or more"),
+  minSpend: z.coerce.number().min(0).optional().default(0),
+  active: z.boolean().optional().default(true),
+  expiresAt: z.string().optional().nullable(),
+  usageLimit: z.coerce.number().int().min(0).optional().nullable(),
+});
+
+export const leadSchema = z.object({
+  items: z
+    .array(
+      z.object({
+        productId: z.string().min(1),
+        variantId: z.string().optional(),
+        variantLabel: z.string().optional(),
+        name: z.string(),
+        price: z.number(),
+        quantity: z.number().int().min(1),
+        image: z.string().optional(),
+      })
+    )
+    .min(1),
+  customer: z.object({
+    name: z.string().max(120).optional().default(""),
+    email: z.string().email("Enter a valid email"),
+    phone: z.string().max(40).optional().default(""),
   }),
 });
 
@@ -36,7 +87,7 @@ export const settingsSchema = z.object({
   // Stripe
   stripeEnabled: z.boolean(),
   stripePublishableKey: z.string().max(200).optional().default(""),
-  // Secrets are optional on update — left blank means "keep the existing value".
+  // Secrets are optional on update, left blank means "keep the existing value".
   stripeSecretKey: z.string().max(200).optional(),
   stripeWebhookSecret: z.string().max(200).optional(),
   // Email (SMTP)

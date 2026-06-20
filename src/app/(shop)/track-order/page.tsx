@@ -10,7 +10,7 @@ export default function TrackOrderPage() {
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    // Placeholder — wire to /api/orders/track once order tracking is built.
+    // Placeholder, wire to /api/orders/track once order tracking is built.
     setMessage(
       "Order tracking is coming soon. For now, please contact us with your order number and we'll update you right away."
     );

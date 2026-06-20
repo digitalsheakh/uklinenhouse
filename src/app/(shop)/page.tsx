@@ -2,27 +2,28 @@ import type { Metadata } from "next";
 import FeatureStrip from "@/components/home/FeatureStrip";
 import TopCategories from "@/components/home/TopCategories";
 import FeaturedSection from "@/components/home/FeaturedSection";
-import BestQualitySection from "@/components/home/BestQualitySection";
 import SaleSection from "@/components/home/SaleSection";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
+import OurStory from "@/components/home/OurStory";
+import CustomerReviews from "@/components/home/CustomerReviews";
+import Newsletter from "@/components/home/Newsletter";
 import HeroSlider from "@/components/home/HeroSlider";
 import CategorySidebar from "@/components/layout/CategorySidebar";
-import { getCategoryTree, getSaleProducts, getHomepageProducts, getFeaturedProducts, getBestQualityProducts } from "@/lib/data";
+import { getCategoryTree, getHomepageProducts, getFeaturedProducts, getSaleProducts } from "@/lib/data";
 import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
-  title: `${siteConfig.name} — ${siteConfig.tagline}`,
+  title: `${siteConfig.name}, ${siteConfig.tagline}`,
   description: siteConfig.description,
   alternates: { canonical: "/" },
 };
 
 export default async function HomePage() {
-  const [categories, onSale, homeProducts, featured, bestQuality] = await Promise.all([
+  const [categories, homeProducts, featured, onSale] = await Promise.all([
     getCategoryTree(),
+    getHomepageProducts(8),
+    getFeaturedProducts(8),
     getSaleProducts(8),
-    getHomepageProducts(6),
-    getFeaturedProducts(12),
-    getBestQualityProducts(12),
   ]);
 
   return (
@@ -39,23 +40,29 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Trust strip (under header) */}
+      {/* Trust strip */}
       <FeatureStrip />
 
-      {/* Top categories (image tiles, scrolls left↔right on mobile) */}
+      {/* Top categories */}
       <TopCategories />
 
-      {/* Featured products — admin-controlled via each product's "Featured" flag */}
-      <FeaturedSection products={featured} />
-
-      {/* On Sale — admin-controlled via each product's Compare-at price */}
-      <SaleSection products={onSale} />
-
-      {/* All Products — admin-curated via each product's "Show on homepage" flag */}
+      {/* 1. All Products */}
       <FeaturedProducts title="All Products" products={homeProducts} />
 
-      {/* Best Quality — admin-controlled via each product's "Best Quality" flag */}
-      <BestQualitySection products={bestQuality} />
+      {/* 2. On Sale (auto-hides when nothing is discounted) */}
+      <SaleSection products={onSale} />
+
+      {/* 3. Our Story (links to /about, /sustainability, /values) */}
+      <OurStory />
+
+      {/* 3. Customer Reviews */}
+      <CustomerReviews />
+
+      {/* 4. Featured Products */}
+      <FeaturedSection products={featured} />
+
+      {/* 5. Join our mailing list */}
+      <Newsletter />
     </>
   );
 }

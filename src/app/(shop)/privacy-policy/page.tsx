@@ -25,12 +25,12 @@ export default function PrivacyPolicyPage() {
       <h2>1. Information we collect</h2>
       <p>Depending on how you use our website and services, we may process:</p>
       <ul>
-        <li><strong>Usage data</strong> — information about how you use our website and services.</li>
-        <li><strong>Account data</strong> — details you provide when registering an account.</li>
-        <li><strong>Profile data</strong> — information included in your profile.</li>
-        <li><strong>Enquiry &amp; correspondence data</strong> — information contained in any enquiry or message you send us.</li>
-        <li><strong>Customer relationship data</strong> — information about our relationship with you.</li>
-        <li><strong>Transaction data</strong> — details of purchases, payments and orders.</li>
+        <li><strong>Usage data</strong>, information about how you use our website and services.</li>
+        <li><strong>Account data</strong>, details you provide when registering an account.</li>
+        <li><strong>Profile data</strong>, information included in your profile.</li>
+        <li><strong>Enquiry &amp; correspondence data</strong>, information contained in any enquiry or message you send us.</li>
+        <li><strong>Customer relationship data</strong>, information about our relationship with you.</li>
+        <li><strong>Transaction data</strong>, details of purchases, payments and orders.</li>
       </ul>
 
       <h2>2. How we use your information</h2>

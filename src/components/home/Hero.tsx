@@ -37,7 +37,7 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.16 }}
             className="mx-auto mt-6 max-w-xl text-base text-grey-500 sm:text-lg"
           >
-            Quality cotton wet towels, table & bath linen, bags and more — supplied
+            Quality cotton wet towels, table & bath linen, bags and more, supplied
             to hospitality businesses and homes across the UK.
           </motion.p>
 

@@ -21,7 +21,7 @@ export async function getStripeConfig() {
   try {
     doc = await getSettings();
   } catch {
-    // DB unreachable — fall back to env-only config.
+    // DB unreachable, fall back to env-only config.
   }
   return {
     enabled: doc?.stripeEnabled ?? false,
@@ -40,7 +40,7 @@ export async function getEmailConfig() {
   try {
     doc = await getSettings();
   } catch {
-    // DB unreachable — fall back to env-only config.
+    // DB unreachable, fall back to env-only config.
   }
   return {
     enabled: doc?.emailEnabled ?? false,

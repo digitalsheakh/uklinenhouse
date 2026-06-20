@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 /**
  * Shared layout for legal / policy pages so they all share one clean,
  * on-brand look. Pass plain semantic HTML as children (h2, h3, p, ul, ol,
- * strong, a) — the prose styles below take care of the formatting.
+ * strong, a), the prose styles below take care of the formatting.
  */
 export default function LegalLayout({
   title,

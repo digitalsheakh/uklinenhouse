@@ -14,8 +14,8 @@ export default function FeaturedProducts({
   products: TProductCard[];
 }) {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20">
-      <Reveal className="mb-10 flex flex-col items-center text-center">
+    <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+      <Reveal className="mb-6 flex flex-col items-center text-center">
         <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{title}</h2>
         {subtitle && <p className="mt-2 text-sm text-grey-500">{subtitle}</p>}
         <Link

@@ -22,7 +22,7 @@ export default function WarehousePromo() {
             </h2>
             <p className="mt-4 max-w-md text-grey-300">
               We hold our range in stock in the UK, so your order is picked, packed and dispatched
-              quickly — no long waits, no overseas delays.
+              quickly, no long waits, no overseas delays.
             </p>
             <Link
               href="/shop"

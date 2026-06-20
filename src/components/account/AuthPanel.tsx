@@ -36,7 +36,7 @@ export default function AuthPanel() {
         setError(data.error || "Something went wrong. Please try again.");
         return;
       }
-      toast.success(mode === "login" ? "Welcome back!" : "Account created — welcome!");
+      toast.success(mode === "login" ? "Welcome back!" : "Account created, welcome!");
       // The server component re-reads the auth cookie and renders the dashboard.
       router.refresh();
     } catch {

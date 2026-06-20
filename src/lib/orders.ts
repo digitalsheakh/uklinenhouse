@@ -19,7 +19,7 @@ export async function markOrderPaid(orderId: string): Promise<string | null> {
   );
   if (!order) return null; // already paid or not found
 
-  // Best-effort stock decrement — never let it fail the payment.
+  // Best-effort stock decrement, never let it fail the payment.
   try {
     for (const item of order.items) {
       await Product.updateOne(
@@ -31,7 +31,7 @@ export async function markOrderPaid(orderId: string): Promise<string | null> {
     console.error("[markOrderPaid] stock decrement failed", err);
   }
 
-  // Send order emails (store owner + customer). Best-effort — never blocks.
+  // Send order emails (store owner + customer). Best-effort, never blocks.
   try {
     await sendNewOrderEmails({
       orderNumber: order.orderNumber || `LN-${String(order._id).slice(-6).toUpperCase()}`,

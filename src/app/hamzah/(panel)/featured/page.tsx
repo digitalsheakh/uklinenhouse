@@ -186,7 +186,7 @@ function Group({
                       <span className="font-medium text-foreground line-clamp-1">{p.name}</span>
                     </div>
                   </td>
-                  <td className="hidden px-4 py-3 text-grey-500 sm:table-cell">{p.category?.name || "—"}</td>
+                  <td className="hidden px-4 py-3 text-grey-500 sm:table-cell">{p.category?.name || "-"}</td>
                   <td className="px-4 py-3 text-foreground">{formatPrice(p.price)}</td>
                   <td className="px-4 py-3">{renderActions(p)}</td>
                 </tr>

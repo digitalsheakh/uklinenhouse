@@ -88,22 +88,25 @@ export const useCart = create<CartState>()(
       count: () => get().items.reduce((n, i) => n + i.quantity, 0),
       subtotal: () => get().items.reduce((s, i) => s + i.price * i.quantity, 0),
       vat: () => get().subtotal() * siteConfig.vatRate,
-      shipping: () => (get().items.length > 0 ? siteConfig.shippingFee : 0),
+      shipping: () => {
+        if (get().items.length === 0) return 0;
+        return get().subtotal() >= siteConfig.freeDeliveryThreshold ? 0 : siteConfig.shippingFee;
+      },
       total: () => {
         const sub = get().subtotal();
-        return sub + sub * siteConfig.vatRate + (get().items.length > 0 ? siteConfig.shippingFee : 0);
+        return sub + sub * siteConfig.vatRate + get().shipping();
       },
     }),
     {
       name: "ulh-cart",
-      // Only persist the items — never the open/closed UI state, so the
+      // Only persist the items, never the open/closed UI state, so the
       // drawer can't reopen itself on load.
       partialize: (state) => ({ items: state.items }),
       // Don't read localStorage during the first render; we rehydrate
       // manually after mount (see CartDrawer) to avoid SSR hydration
       // mismatches that would break client-side JS on the whole page.
       skipHydration: true,
-      // Only restore the saved items — never any stale UI state.
+      // Only restore the saved items, never any stale UI state.
       merge: (persisted, current) => ({
         ...current,
         items: (persisted as { items?: CartItem[] })?.items ?? [],

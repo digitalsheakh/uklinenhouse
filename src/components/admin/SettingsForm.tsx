@@ -171,7 +171,7 @@ export default function SettingsForm({ initial }: { initial: SettingsState }) {
         </label>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          <TextField label="Send order alerts to" hint="Your inbox — where new-order alerts arrive." value={orderNotifyEmail} onChange={setOrderNotifyEmail} placeholder="you@uklinenhouse.co.uk" />
+          <TextField label="Send order alerts to" hint="Your inbox, where new-order alerts arrive." value={orderNotifyEmail} onChange={setOrderNotifyEmail} placeholder="you@uklinenhouse.co.uk" />
           <TextField label="From address" hint="The address emails are sent from." value={emailFrom} onChange={setEmailFrom} placeholder="orders@uklinenhouse.co.uk" />
           <TextField label="SMTP host" value={smtpHost} onChange={setSmtpHost} placeholder="smtp.gmail.com" />
           <TextField label="SMTP port" value={smtpPort} onChange={setSmtpPort} placeholder="587" />

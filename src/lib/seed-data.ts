@@ -1,6 +1,6 @@
 /*
   =====================================================================
-  CATEGORY TREE — your initial categories & subcategories.
+  CATEGORY TREE, your initial categories & subcategories.
   Used to seed the database (npm run seed) and as a fallback for the
   navigation before the database is populated.
   You can add/edit/remove all of these later from the /hamzah admin panel.

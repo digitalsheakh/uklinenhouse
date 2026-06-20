@@ -94,7 +94,7 @@ export default function AccountDashboard({ user, orders }: { user: AccountUser; 
               }`}
             >
               <Building2 size={13} />
-              {user.approved ? "Wholesale account — approved" : "Wholesale account — pending approval"}
+              {user.approved ? "Wholesale account, approved" : "Wholesale account, pending approval"}
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-50 px-3 py-1 text-xs font-semibold text-accent">

@@ -270,7 +270,7 @@ export default function ProductForm({ initial }: { initial?: ProductFormData }) 
                 onChange={(e) => set("description", e.target.value)}
                 rows={8}
                 className="inp font-mono text-xs"
-                placeholder="<p>Describe the product…</p> — use the buttons above to insert HTML."
+                placeholder="<p>Describe the product…</p>, use the buttons above to insert HTML."
               />
             )}
             <p className="mt-1 text-xs text-grey-400">Write plain text or HTML. Click Preview to see how it will look on the product page.</p>
@@ -320,7 +320,7 @@ export default function ProductForm({ initial }: { initial?: ProductFormData }) 
             />
           </label>
 
-          {/* Thumbnails — drag to reorder; drop into first position to set the main image */}
+          {/* Thumbnails, drag to reorder; drop into first position to set the main image */}
           {form.images.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-3">
               {form.images.map((img, i) => (
@@ -386,7 +386,7 @@ export default function ProductForm({ initial }: { initial?: ProductFormData }) 
         <Card title="Search engine optimisation (SEO)">
           <Field
             label="Meta title"
-            hint={`${metaTitleLen} characters — aim for 50–60 for best results.`}
+            hint={`${metaTitleLen} characters, aim for 50–60 for best results.`}
           >
             <div className="flex gap-2">
               <input
@@ -408,7 +408,7 @@ export default function ProductForm({ initial }: { initial?: ProductFormData }) 
 
           <Field
             label="Meta description"
-            hint={`${metaDescLen} characters — a detailed summary (150–300 chars works well for rich results).`}
+            hint={`${metaDescLen} characters, a detailed summary (150–300 chars works well for rich results).`}
           >
             <div className="space-y-2">
               <textarea
@@ -416,7 +416,7 @@ export default function ProductForm({ initial }: { initial?: ProductFormData }) 
                 onChange={(e) => set("metaDescription", e.target.value)}
                 rows={4}
                 className="inp"
-                placeholder="A full, descriptive summary of the product for search engines — you can make this as long and detailed as the product description."
+                placeholder="A full, descriptive summary of the product for search engines, you can make this as long and detailed as the product description."
               />
               <button
                 type="button"
@@ -465,7 +465,7 @@ export default function ProductForm({ initial }: { initial?: ProductFormData }) 
             ))}
           </select>
           {cats.length === 0 && (
-            <p className="mt-2 text-xs text-amber-600">No categories yet — add one first.</p>
+            <p className="mt-2 text-xs text-amber-600">No categories yet, add one first.</p>
           )}
         </Card>
 

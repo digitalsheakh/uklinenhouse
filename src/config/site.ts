@@ -1,6 +1,6 @@
 /*
   =====================================================================
-  SITE CONFIG — edit your brand details here in one place.
+  SITE CONFIG, edit your brand details here in one place.
   =====================================================================
 */
 
@@ -35,13 +35,14 @@ export const siteConfig = {
   // VAT and shipping are added at checkout.
   vatRate: 0.2, // 20% UK VAT
   shippingFee: 7.5, // flat shipping & handling per order (£)
+  freeDeliveryThreshold: 100, // free delivery once the order (ex VAT) reaches this (£)
 
   // Admin panel path
   adminPath: "/hamzah",
 
   // Top notification bar
   topBar: {
-    message: "Free delivery on trade orders over £150. Nationwide UK shipping",
+    message: "Free delivery on all orders over £100. Nationwide UK shipping",
     brochureUrl: "/brochure.pdf", // drop a PDF in /public, or change this link
   },
 } as const;

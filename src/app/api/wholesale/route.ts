@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       ok: true,
       message:
-        "Thank you — your trade account request has been received. We'll review it and send your wholesale price list shortly.",
+        "Thank you, your trade account request has been received. We'll review it and send your wholesale price list shortly.",
     });
   } catch (err) {
     console.error("[wholesale]", err);
