@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight, PackageOpen } from "lucide-react";
-import { getCategoryBySlug, getCategoryTree, getProducts } from "@/lib/data";
+import { getCategoryBySlug, getCategoryTree, getChildCategories, getProducts } from "@/lib/data";
 import { siteConfig } from "@/config/site";
 import CategorySidebar from "@/components/layout/CategorySidebar";
 import ProductGrid from "@/components/product/ProductGrid";
 import ShopToolbar from "@/components/shop/ShopToolbar";
+import CategoryTiles from "@/components/shop/CategoryTiles";
 
 type Props = {
   params: Promise<{ slug?: string[] }>;
@@ -36,7 +37,7 @@ export default async function ShopPage({ params, searchParams }: Props) {
   const { q, sort } = await searchParams;
   const catSlug = activeSlug(slug);
 
-  const [categories, category, products] = await Promise.all([
+  const [categories, category, products, children] = await Promise.all([
     getCategoryTree(),
     catSlug ? getCategoryBySlug(catSlug) : Promise.resolve(null),
     getProducts({
@@ -44,6 +45,7 @@ export default async function ShopPage({ params, searchParams }: Props) {
       search: q,
       sort: (sort as "newest" | "price-asc" | "price-desc") || "newest",
     }),
+    catSlug ? getChildCategories(catSlug) : Promise.resolve([]),
   ]);
 
   const heading = q
@@ -88,9 +90,22 @@ export default async function ShopPage({ params, searchParams }: Props) {
             <p className="mb-4 max-w-2xl text-sm text-grey-500">{category.description}</p>
           )}
           <div className="mt-4">
+            {/* Subcategory tiles (e.g. Bed Linen → Duvets / Sheets / Pillow Cases). */}
+            {category && children.length > 0 && !q && (
+              <CategoryTiles
+                parentSlug={category.slug}
+                parentName={category.name}
+                tiles={children}
+              />
+            )}
+
             <ShopToolbar count={products.length} />
             {products.length > 0 ? (
               <ProductGrid products={products} />
+            ) : children.length > 0 && !q ? (
+              // When a parent category has subcategories but no own products,
+              // we've already shown the tiles above. Keep this area quiet.
+              null
             ) : (
               <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-grey-300 bg-grey-50 py-20 text-center">
                 <PackageOpen size={40} className="text-grey-300" />

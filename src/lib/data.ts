@@ -142,6 +142,39 @@ export interface CategoryInfo {
   parentSlug?: string;
 }
 
+export interface CategoryTile {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+}
+
+/**
+ * Return the active subcategories of a parent (by parent slug), sorted by
+ * the admin-defined `order`. Used to render the tile grid shown when a
+ * customer opens a parent category like Bed Linen.
+ */
+export async function getChildCategories(parentSlug: string): Promise<CategoryTile[]> {
+  try {
+    await connectDB();
+    const parent = await Category.findOne({ slug: parentSlug, isActive: true }).lean();
+    if (!parent) return [];
+    const children = await Category.find({ parent: parent._id, isActive: true })
+      .sort({ order: 1, name: 1 })
+      .lean();
+    return children.map((c) => ({
+      _id: String(c._id),
+      name: c.name,
+      slug: c.slug,
+      description: c.description || "",
+      image: c.image || "",
+    }));
+  } catch {
+    return [];
+  }
+}
+
 /** Look up a category by slug (for listing page headers & breadcrumbs). */
 export async function getCategoryBySlug(slug: string): Promise<CategoryInfo | null> {
   try {
